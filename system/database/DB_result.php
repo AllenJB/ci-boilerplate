@@ -400,8 +400,13 @@ class CI_DB_result {
 	public function field_data() { return array(); }
 	public function free_result() { return TRUE; }
 	protected function _data_seek() { return TRUE; }
-	protected function _fetch_assoc() { return array(); }
-	protected function _fetch_object() { return array(); }
+	public function _fetch_assoc() { return array(); }
+
+
+    /**
+     * @return object
+     */
+    public function _fetch_object() { return NULL; }
 
 }
 // END DB_result class

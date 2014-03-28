@@ -296,7 +296,7 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 *
 	 * @access	public
 	 * @param	string
-	 * @param	bool	whether or not the string will be used in a LIKE condition
+	 * @param	bool $like whether or not the string will be used in a LIKE condition
 	 * @return	string
 	 */
 	function escape_str($str, $like = FALSE)
@@ -317,7 +317,7 @@ class CI_DB_mysqli_driver extends CI_DB {
 		}
 		elseif (function_exists('mysql_escape_string'))
 		{
-			$str = mysql_escape_string($str);
+			$str = @mysql_escape_string($str);
 		}
 		else
 		{

@@ -1,0 +1,6 @@
+- .hg
+- .hgignore
+- .idea
+- Makefile
+- nbproject
+- /dev

@@ -243,11 +243,12 @@ class CI_DB_driver {
 	 * will raise an error.
 	 *
 	 * @access	public
-	 * @param	string	An SQL query string
-	 * @param	array	An array of binding data
-	 * @return	mixed
+	 * @param	string $sql	An SQL query string
+	 * @param	array|bool $binds	An array of binding data
+     * @param bool $return_object
+	 * @return	mixed|CI_DB_Result|bool
 	 */
-	function query($sql, $binds = FALSE, $return_object = TRUE)
+	public function query($sql, $binds = FALSE, $return_object = TRUE)
 	{
 		if ($sql == '')
 		{
@@ -286,11 +287,8 @@ class CI_DB_driver {
 			}
 		}
 
-		// Save the  query for debugging
-		if ($this->save_queries == TRUE)
-		{
-			$this->queries[] = $sql;
-		}
+        // Save only the latest query for debugging
+        $this->queries = array ($sql);
 
 		// Start the Query Timer
 		$time_start = list($sm, $ss) = explode(' ', microtime());
@@ -659,7 +657,7 @@ class CI_DB_driver {
 	 * Returns the last query that was executed
 	 *
 	 * @access	public
-	 * @return	void
+	 * @return	string
 	 */
 	function last_query()
 	{

@@ -1,0 +1,2 @@
+# This blank screenrc is used to override any user-specific screenrc settings
+# (as certain setups can stop screen working the way we want)

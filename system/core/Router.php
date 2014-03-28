@@ -25,6 +25,8 @@
  * @author		ExpressionEngine Dev Team
  * @category	Libraries
  * @link		http://codeigniter.com/user_guide/general/routing.html
+ *
+ * @property CI_URI $uri
  */
 class CI_Router {
 
@@ -101,7 +103,7 @@ class CI_Router {
 	 * @access	private
 	 * @return	void
 	 */
-	function _set_routing()
+	public function _set_routing()
 	{
 		// Are query strings enabled in the config file?  Normally CI doesn't utilize query strings
 		// since URI segments are more search-engine friendly, but they can optionally be used.
@@ -148,7 +150,8 @@ class CI_Router {
 		// Were there any query string segments?  If so, we'll validate them and bail out since we're done.
 		if (count($segments) > 0)
 		{
-			return $this->_validate_request($segments);
+			$this->_validate_request($segments);
+            return;
 		}
 
 		// Fetch the complete URI string
@@ -157,7 +160,8 @@ class CI_Router {
 		// Is there a URI string? If not, the default controller specified in the "routes" file will be shown.
 		if ($this->uri->uri_string == '')
 		{
-			return $this->_set_default_controller();
+			$this->_set_default_controller();
+            return;
 		}
 
 		// Do we need to remove the URL suffix?
@@ -222,13 +226,14 @@ class CI_Router {
 	 * @param	bool
 	 * @return	void
 	 */
-	function _set_request($segments = array())
+	protected function _set_request($segments = array())
 	{
 		$segments = $this->_validate_request($segments);
 
 		if (count($segments) == 0)
 		{
-			return $this->_set_default_controller();
+			$this->_set_default_controller();
+            return;
 		}
 
 		$this->set_class($segments[0]);
@@ -261,7 +266,7 @@ class CI_Router {
 	 * @param	array
 	 * @return	array
 	 */
-	function _validate_request($segments)
+	protected function _validate_request($segments)
 	{
 		if (count($segments) == 0)
 		{
@@ -346,6 +351,7 @@ class CI_Router {
 
 		// Nothing else to do at this point but show a 404
 		show_404($segments[0]);
+        return NULL;
 	}
 
 	// --------------------------------------------------------------------
@@ -368,7 +374,8 @@ class CI_Router {
 		// Is there a literal match?  If so we're done
 		if (isset($this->routes[$uri]))
 		{
-			return $this->_set_request(explode('/', $this->routes[$uri]));
+			$this->_set_request(explode('/', $this->routes[$uri]));
+            return;
 		}
 
 		// Loop through the route array looking for wild-cards
@@ -386,7 +393,8 @@ class CI_Router {
 					$val = preg_replace('#^'.$key.'$#', $val, $uri);
 				}
 
-				return $this->_set_request(explode('/', $val));
+				$this->_set_request(explode('/', $val));
+                return;
 			}
 		}
 

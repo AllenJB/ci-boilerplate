@@ -1,0 +1,16 @@
+# NOTE: This file MUST be saved in unix format (\n / LF only)
+# This file may be included in-place using the following in /etc/logrotate.d/diva :
+# include /var/www/vhosts/diva/httpdocs/etc/logrotate
+
+"/var/www/vhosts/project/httpdocs/application/data/logs/processes/*/*/current.log" {
+    missingok
+    nocreate
+    compress
+
+    maxage 30
+
+    daily
+    dateext
+    dateformat %Y-%m-%d.
+    extension log
+}

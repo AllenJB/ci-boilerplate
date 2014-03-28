@@ -36,6 +36,26 @@ define('FOPEN_READ_WRITE_CREATE',				'a+b');
 define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
+if (!defined('DEVELOPER_EMAILS')) {
+    define('DEVELOPER_EMAILS', join(',', array(
+        "user@example.com",
+    )));
+}
+
+define('DATA_DIR', realpath(APPPATH .'/data/') .'/');
+define('DATA_DIR_PUBLIC', realpath(FCPATH .'/data/') .'/');
+define('DATA_DIR_PUBLIC_URL', '/data/');
+
+if (!defined('ROOT_DOMAIN')) {
+    define('ROOT_DOMAIN', 'example.com');
+}
+define('URL_PROTOCOL', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https' : 'http'));
+
+
+session_save_path(DATA_DIR .'session/');
+define('LOG_FILE_PHP', DATA_DIR .'logs/'. date('Ymd') .'_php_errors.log');
+
+ini_set('error_log', LOG_FILE_PHP);
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

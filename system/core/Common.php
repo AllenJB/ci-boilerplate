@@ -165,7 +165,7 @@ if ( ! function_exists('load_class'))
 		{
 			// Note: We use exit() rather then show_error() in order to avoid a
 			// self-referencing loop with the Excptions class
-			exit('Unable to locate the specified class: '.$class.'.php');
+			throw new Exception('Unable to locate the specified class: '.$class.'.php');
 		}
 
 		// Keep track of what we just loaded
@@ -231,7 +231,7 @@ if ( ! function_exists('get_config'))
 		// Fetch the config file
 		if ( ! file_exists($file_path))
 		{
-			exit('The configuration file does not exist.');
+			throw new Exception('The configuration file does not exist.');
 		}
 
 		require($file_path);
@@ -239,7 +239,7 @@ if ( ! function_exists('get_config'))
 		// Does the $config array exist in the file?
 		if ( ! isset($config) OR ! is_array($config))
 		{
-			exit('Your config file does not appear to be formatted correctly.');
+			throw new Exception('Your config file does not appear to be formatted correctly.');
 		}
 
 		// Are any values being dynamically replaced?
@@ -468,16 +468,6 @@ if ( ! function_exists('_exception_handler'))
 {
 	function _exception_handler($severity, $message, $filepath, $line)
 	{
-		 // We don't bother with "strict" notices since they tend to fill up
-		 // the log file with excess information that isn't normally very helpful.
-		 // For example, if you are running PHP 5 and you use version 4 style
-		 // class functions (without prefixes like "public", "private", etc.)
-		 // you'll get notices telling you that these have been deprecated.
-		if ($severity == E_STRICT)
-		{
-			return;
-		}
-
 		$_error =& load_class('Exceptions', 'core');
 
 		// Should we display the error? We'll get the current error_reporting
@@ -488,12 +478,13 @@ if ( ! function_exists('_exception_handler'))
 		}
 
 		// Should we log the error?  No?  We're done...
-		if (config_item('log_threshold') == 0)
+		if ((config_item('log_threshold') == 0) || ($severity == E_STRICT))
 		{
-			return;
+			return FALSE;
 		}
 
 		$_error->log_exception($severity, $message, $filepath, $line);
+        return FALSE;
 	}
 }
 

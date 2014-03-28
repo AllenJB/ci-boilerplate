@@ -1,0 +1,1 @@
+<p>This is the index page for admin.<?= ROOT_DOMAIN; ?></p>

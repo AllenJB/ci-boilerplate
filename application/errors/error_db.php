@@ -55,8 +55,8 @@ p {
 </head>
 <body>
 	<div id="container">
-		<h1><?php echo $heading; ?></h1>
-		<?php echo $message; ?>
+		<h1>Database Error</h1>
+		<p>Please file a bug about this problem.</p>
 	</div>
 </body>
 </html>

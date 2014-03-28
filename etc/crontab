@@ -1,0 +1,14 @@
+# Live cron.d file
+# NOTE: If this file is symlinked, updates will not be automatically reloaded if inotify is enabled (known cronie/inotify limitation)
+# Always run "/etc/init.d/crond reload" to be sure
+
+RUN_FROM_CRONTAB=1
+PROJ_EXEC="/var/www/vhosts/project/httpdocs/public/index.php"
+# Note: This can be a comma seperated list of addresses
+# Note: Cron jobs should generally be silent, preferring internal error handling and notification mechanisms to notify
+#   developers of errors (as these will give much better information on where and why the error occurred)
+# MAILTO=user@example.com
+
+# mn hr  dom mon dow  cmd
+*/2 * * * *   root /usr/bin/php ${PROJ_EXEC} /_cron/misc/notifyLoggedErrors
+0 1 * * *     root /usr/bin/php ${PROJ_EXEC} /_cron/misc/gc

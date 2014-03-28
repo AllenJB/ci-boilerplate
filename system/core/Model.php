@@ -23,6 +23,9 @@
  * @category	Libraries
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/config.html
+ *
+ * @property CI_DB_driver|CI_DB_active_record|CI_DB_mysqli_driver $db
+ * @property CI_Loader $load
  */
 class CI_Model {
 

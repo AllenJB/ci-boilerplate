@@ -701,6 +701,7 @@ class CI_Upload {
 	{
 		if ($this->upload_path == '')
 		{
+            trigger_error("Invalid upload path: {$this->upload_path} (not set)", E_USER_NOTICE);
 			$this->set_error('upload_no_filepath');
 			return FALSE;
 		}
@@ -712,6 +713,7 @@ class CI_Upload {
 
 		if ( ! @is_dir($this->upload_path))
 		{
+            trigger_error("Invalid upload path: {$this->upload_path}", E_USER_NOTICE);
 			$this->set_error('upload_no_filepath');
 			return FALSE;
 		}
@@ -901,15 +903,15 @@ class CI_Upload {
 			foreach ($msg as $val)
 			{
 				$msg = ($CI->lang->line($val) == FALSE) ? $val : $CI->lang->line($val);
-				$this->error_msg[] = $msg;
+				$this->error_msg[$val] = $msg;
 				log_message('error', $msg);
 			}
 		}
 		else
 		{
-			$msg = ($CI->lang->line($msg) == FALSE) ? $msg : $CI->lang->line($msg);
-			$this->error_msg[] = $msg;
-			log_message('error', $msg);
+			$message = ($CI->lang->line($msg) == FALSE) ? $msg : $CI->lang->line($msg);
+			$this->error_msg[$msg] = $message;
+			log_message('error', $message);
 		}
 	}
 

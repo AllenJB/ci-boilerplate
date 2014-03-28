@@ -26,6 +26,15 @@
  * @category	Libraries
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/general/controllers.html
+ *
+ * @property CI_DB_active_record|CI_DB_mysqli_driver $db
+ * @property CI_Loader $load
+ * @property CI_Output $output
+ * @property CI_Input $input
+ * @property CI_Benchmark $benchmark
+ * @property CI_Config $config
+ * @property CI_URI $uri
+ * @property CI_Router $router
  */
 class CI_Controller {
 
@@ -53,6 +62,9 @@ class CI_Controller {
 		log_message('debug', "Controller Class Initialized");
 	}
 
+    /**
+     * @return CI_Controller
+     */
 	public static function &get_instance()
 	{
 		return self::$instance;

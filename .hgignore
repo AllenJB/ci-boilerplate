@@ -1,0 +1,8 @@
+syntax: glob
+nbproject
+.idea
+.svn
+application/config/database.php
+application/config/development/database.php
+application/config/testing/database.php
+application/config/staging/database.php

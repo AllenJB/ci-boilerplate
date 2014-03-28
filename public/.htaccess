@@ -1,0 +1,14 @@
+AddDefaultCharset UTF-8
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond $1 !^(index\.php|images|robots\.txt|favicon.ico)
+RewriteRule ^(.*)$ /index.php/$1 [L]
+
+# Disable session autostart
+# The admin area starts the PHP session itself
+# While we don't use sessions at all for the API
+php_value session.auto_start 0

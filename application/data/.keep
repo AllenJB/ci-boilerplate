@@ -1,0 +1,3 @@
+Data directory for storing files.
+This includes misc. files used by the application (eg. SQL scripts for DB initialization), files created by scripts
+(eg. logs) and files uploaded by users.
