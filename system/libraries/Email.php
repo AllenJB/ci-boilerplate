@@ -6,7 +6,7 @@
  *
  * @package		CodeIgniter
  * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -1025,7 +1025,7 @@ class CI_Email {
 
 				if ($this->_get_protocol() == 'mail')
 				{
-					$this->_header_str .= $hdr;
+					$this->_header_str .= rtrim($hdr);
 					$this->_finalbody = $this->_body;
 				}
 				else
@@ -1063,7 +1063,7 @@ class CI_Email {
 
 				if ($this->_get_protocol() == 'mail')
 				{
-					$this->_header_str .= $hdr;
+					$this->_header_str .= rtrim($hdr);
 				}
 				else
 				{
@@ -1085,7 +1085,7 @@ class CI_Email {
 
 				if ($this->_get_protocol() == 'mail')
 				{
-					$this->_header_str .= $hdr;
+					$this->_header_str .= rtrim($hdr);
 				}
 
 				$body .= $this->_get_mime_message() . $this->newline . $this->newline;
@@ -1103,7 +1103,7 @@ class CI_Email {
 
 				if ($this->_get_protocol() == 'mail')
 				{
-					$this->_header_str .= $hdr;
+					$this->_header_str .= rtrim($hdr);
 				}
 
 				$body .= $this->_get_mime_message() . $this->newline . $this->newline;
