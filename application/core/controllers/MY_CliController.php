@@ -1,5 +1,7 @@
 <?php
 
+include(APPPATH . '/third_party/cli_colors.php');
+
 /**
  * Base class for all commandline scripts / processes / crons
  *

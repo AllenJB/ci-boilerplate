@@ -1,5 +1,12 @@
 <?php
 
+if (! defined('CLI_LGRAY')) {
+    define('CLI_NORMAL', '');
+    define('CLI_LGRAY', '');
+    define('CLI_YELLOW', '');
+    define('CLI_LRED', '');
+}
+
 class Logger
 {
 
@@ -7,6 +14,14 @@ class Logger
      * @var array All available log levels. The MUST be in order.
      */
     protected $levels = array('debug', 'info', 'warn', 'error', 'fatal');
+
+    protected $levelColors = array(
+        'debug' => CLI_LGRAY,
+        'info' => CLI_LGRAY,
+        'warn' => CLI_YELLOW,
+        'error' => CLI_LRED,
+        'fatal' => CLI_LRED,
+    );
 
     /**
      * @var int The current logging level
@@ -22,6 +37,11 @@ class Logger
      * @var bool Log to disk?
      */
     protected $logToDisk = true;
+
+    /**
+     * @var bool Log to memory (store log for later dump)?
+     */
+    protected $logToMemory = false;
 
     /**
      * @var null|string Directory to store logs in
@@ -53,11 +73,24 @@ class Logger
      */
     protected $lineDateFormat = 'Y-m-d H:i:s';
 
+    protected $colorsEnabled = false;
+
+    /**
+     * @var string[] In-memory log
+     */
+    protected $memlog = array();
+
 
     public function __construct()
     {
         // Flip levels, so that $this->levels[$level] gives us a number
         $this->levels = array_flip($this->levels);
+    }
+
+
+    public function setEnableColors($enabled = true)
+    {
+        $this->colorsEnabled = $enabled;
     }
 
 
@@ -154,8 +187,21 @@ class Logger
             return;
         }
 
-        $level = strtoupper($level);
-        $line = $this->date() . " {$level} {$this->prefix}{$msg} \n";
+        $levelTxt = str_pad(strtoupper($level), 5, ' ', STR_PAD_LEFT);
+        $date = $this->date();
+        if (strlen($date) > 0) {
+            $date .= ' ';
+        }
+        $line = "{$date}{$levelTxt} {$this->prefix}{$msg} \n";
+        $consoleLine = $line;
+        if ($this->colorsEnabled) {
+            $consoleLine = $date . $this->levelColors[$level] . $levelTxt . CLI_NORMAL . " {$this->prefix}{$msg} \n";
+        }
+
+        if ($this->logToMemory) {
+            $this->memlog[] = $line;
+        }
+
         if ($this->logToDisk && strlen($this->file)) {
             if (file_exists($this->file) && (! is_writable($this->file))) {
                 $this->logToDisk = false;
@@ -170,7 +216,7 @@ class Logger
         }
 
         if ($this->logToConsole) {
-            print $line;
+            print $consoleLine;
         }
     }
 
@@ -218,8 +264,19 @@ class Logger
         $this->log($msg, $level, true);
 
         if ($this->logToConsole) {
-            $level = strtoupper($level);
-            $line = "\r\x1B[K" . $this->date() . " {$level} {$this->prefix}{$msg}";
+            $levelTxt = str_pad(strtoupper($level), 5, ' ', STR_PAD_LEFT);
+            $date = $this->date();
+            if (strlen($date) > 0) {
+                $date .= ' ';
+            }
+
+            $line = $date . $this->levelColors[$level] . "{$levelTxt} {$this->prefix}{$msg} \n";
+            $consoleLine = $line;
+            if ($this->colorsEnabled) {
+                $consoleLine = $date . $this->levelColors[$level] . $levelTxt . CLI_NORMAL . " {$this->prefix}{$msg} \n";
+            }
+
+            $line = "\r\x1B[K" . trim($consoleLine) . CLI_NORMAL;
             print $line;
         }
     }
@@ -316,5 +373,17 @@ class Logger
     public function setLogToDisk($enabled = true)
     {
         $this->logToDisk = $enabled;
+    }
+
+
+    public function setLogToMemory($enabled = true)
+    {
+        $this->logToMemory = $enabled;
+    }
+
+
+    public function dumpLog()
+    {
+        return $this->memlog;
     }
 }
