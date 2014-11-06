@@ -269,7 +269,7 @@ function shutdown_handler()
         . "_SESSION:\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'unset') . "\n\n"
         . "_SERVER:\n" . print_r($_SERVER, true) . "\n\n"
         . "--- EOM ---\n";
-    @mail(DEVELOPER_EMAILS, PROJECT_NAME . " Shutdown PHP Error", $msg);
+    @mail($emails, PROJECT_NAME . " Shutdown PHP Error", $msg);
 
     if (defined('ERROR_HANDLER_LOG')) {
         file_put_contents(ERROR_HANDLER_LOG, $msg, FILE_APPEND);

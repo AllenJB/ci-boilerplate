@@ -9,10 +9,10 @@ class MY_Exceptions extends CI_Exceptions
 
     protected $outputFormat = 'html';
 
-    static $errors = array();
+    protected $requestSizeLimit = 1024;
 
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         if (defined('PROJECT_NAME')) {
@@ -55,7 +55,7 @@ class MY_Exceptions extends CI_Exceptions
 
     protected function isCliRequest()
     {
-        return (php_sapi_name() === 'cli' OR defined('STDIN'));
+        return ((php_sapi_name() === 'cli') || defined('STDIN'));
     }
 
 
@@ -64,6 +64,7 @@ class MY_Exceptions extends CI_Exceptions
      *
      * @param string $page the page
      * @param bool $log_error log error? yes/no
+     *
      * @return void
      */
     public function show_404($page = '', $log_error = true)
@@ -105,6 +106,7 @@ class MY_Exceptions extends CI_Exceptions
      * @param    string $message the message
      * @param    string $template the template name
      * @param    int $status_code the status code
+     *
      * @return    string Output to display
      */
     public function show_error($heading, $message, $template = 'error_general', $status_code = 500)
@@ -182,10 +184,12 @@ class MY_Exceptions extends CI_Exceptions
 
             if (is_array($value) || is_object($value)) {
                 $output .= "\n" . print_r($value) . "\n";
-            } else if (is_string($value) && (strlen($value) > 80)) {
-                $output .= "\nt$value\n";
             } else {
-                $output .= $value;
+                if (is_string($value) && (strlen($value) > 80)) {
+                    $output .= "\nt$value\n";
+                } else {
+                    $output .= $value;
+                }
             }
         }
 
@@ -196,7 +200,7 @@ class MY_Exceptions extends CI_Exceptions
             . "\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'UNSET');
 
         $requestDump = print_r($_REQUEST, true);
-        if (strlen($requestDump) < 512) {
+        if (strlen($requestDump) < $this->requestSizeLimit) {
             $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
@@ -250,6 +254,7 @@ class MY_Exceptions extends CI_Exceptions
      * @param    string $message the error string
      * @param    string $filepath the error filepath
      * @param    string $line the error line number
+     *
      * @return    string Output to diaplay
      */
     public function show_php_error($severity, $message, $filepath, $line)
@@ -294,7 +299,7 @@ class MY_Exceptions extends CI_Exceptions
             . "\n\n_SESSION:\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'UNSET');
 
         $requestDump = print_r($_REQUEST, true);
-        if (strlen($requestDump) < 512) {
+        if (strlen($requestDump) < $this->requestSizeLimit) {
             $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
@@ -378,7 +383,7 @@ class MY_Exceptions extends CI_Exceptions
         }
 
         $requestDump = print_r($_REQUEST, true);
-        if (strlen($requestDump) < 512) {
+        if (strlen($requestDump) < $this->requestSizeLimit) {
             $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
@@ -404,26 +409,30 @@ class MY_Exceptions extends CI_Exceptions
             $buffer = ob_get_contents();
             ob_end_clean();
             echo $buffer;
-        } else if ($this->outputFormat == 'text') {
-            print "\nUncaught Exception: {$message}"
-                . "\nLocation: {$filepath} @ line {$line}"
-                . "\n\n{$stacktrace}\n";
-        } else if ($this->outputFormat == 'json') {
-            if (ENVIRONMENT == 'production') {
-                $response = array(
-                    'status' => 'error',
-                    'error' => 'internal_server_error',
-                    'error_message' => "A technical fault has occurred. The developers have been notified. Please contact support if the issue persists.",
-                );
+        } else {
+            if ($this->outputFormat == 'text') {
+                print "\nUncaught Exception: {$message}"
+                    . "\nLocation: {$filepath} @ line {$line}"
+                    . "\n\n{$stacktrace}\n";
             } else {
-                $response = array(
-                    'status' => 'error',
-                    'error' => 'uncaught exception',
-                    'error_message' => $e->getMessage(),
-                    'exception' => $this->get_exception_as_array($e),
-                );
+                if ($this->outputFormat == 'json') {
+                    if (ENVIRONMENT == 'production') {
+                        $response = array(
+                            'status' => 'error',
+                            'error' => 'internal_server_error',
+                            'error_message' => "A technical fault has occurred. The developers have been notified. Please contact support if the issue persists.",
+                        );
+                    } else {
+                        $response = array(
+                            'status' => 'error',
+                            'error' => 'uncaught exception',
+                            'error_message' => $e->getMessage(),
+                            'exception' => $this->get_exception_as_array($e),
+                        );
+                    }
+                    print json_encode($response);
+                }
             }
-            print json_encode($response);
         }
 
         exit(1);
@@ -459,8 +468,8 @@ class MY_Exceptions extends CI_Exceptions
                 continue;
             }
 
-            if (array_key_exists('file', $call) && (stripos($call['file'], FCPATH) === 0)) {
-                $call['file'] = str_replace(FCPATH, '', $call['file']);
+            if (array_key_exists('file', $call) && (stripos($call['file'], PROJECT_ROOT) === 0)) {
+                $call['file'] = str_replace(PROJECT_ROOT, '', $call['file']);
             }
 
             $args = "";
@@ -472,15 +481,29 @@ class MY_Exceptions extends CI_Exceptions
 
                     if (is_object($arg)) {
                         $args .= get_class($arg);
-                    } else if (is_array($arg)) {
+                    } elseif (is_array($arg)) {
                         $args .= 'Array[]';
-                    } else if (is_string($arg)) {
+                    } elseif (is_string($arg)) {
                         $args .= '"' . $arg . '"';
+                    } elseif (is_bool($arg)) {
+                        $args .= ($arg ? 'TRUE' : 'FALSE');
                     } else {
-                        $args .= $arg;
+                        if ($arg === null) {
+                            $args .= 'NULL';
+                        } else {
+                            $args .= $arg;
+                        }
                     }
                 }
             }
+
+            $keys = array('class', 'function', 'file', 'line');
+            foreach ($keys as $key) {
+                if (! array_key_exists($key, $call)) {
+                    $call[$key] = '';
+                }
+            }
+
             $stacktrace .= $index . ': ' . @$call['class'] . '::' . @$call['function'] . "($args)"
                 . "\n\t" . @$call['file'] . '(' . @$call['line'] . ')'
                 . "\n";
@@ -492,10 +515,13 @@ class MY_Exceptions extends CI_Exceptions
 
     /**
      * @param Exception $e
+     *
      * @return string
      */
-    protected function get_exception_stack_string($e)
-    {
+    protected
+    function get_exception_stack_string(
+        $e
+    ) {
         $email = "Message: {$e->getMessage()}"
             . "\nCode: " . $e->getCode()
             . "\nLine: " . $e->getLine()
