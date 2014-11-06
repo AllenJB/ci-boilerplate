@@ -17,4 +17,10 @@ class MY_Loader extends CI_Loader
         $path = rtrim($path, '/') . '/';
         $this->_ci_view_paths = array(APPPATH . $path => true);
     }
+
+
+    public function get_all_vars()
+    {
+        return $this->_ci_cached_vars;
+    }
 }

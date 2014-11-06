@@ -146,7 +146,11 @@ class MY_Router extends CI_Router
                 return $segments;
             }
 
-            show_404($_SERVER['REQUEST_URI']);
+            if (array_key_exists('REQUEST_URI', $_SERVER)) {
+                show_404($_SERVER['REQUEST_URI']);
+            } else {
+                show_404($this->uri->uri_string());
+            }
             return null;
         }
 
