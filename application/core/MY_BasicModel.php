@@ -7,6 +7,26 @@ class MY_BasicModel extends CI_Model
     public function __construct()
     {
         parent::__construct();
+        $this->setSqlMode();
+    }
+
+
+    protected function setSqlMode()
+    {
+        $modes = array(
+            'ERROR_FOR_DIVISION_BY_ZERO',
+            'NO_ZERO_DATE',
+            'NO_ZERO_IN_DATE',
+            'STRICT_ALL_TABLES',
+        );
+        $this->db->query("SET sql_mode = '" . join(',', $modes) . "'");
+    }
+
+
+    public function getSqlMode()
+    {
+        $resultSet = $this->db->query('SELECT @@SESSION.sql_mode AS `sqlmode`;');
+        return $resultSet->row()->sqlmode;
     }
 
 
@@ -41,6 +61,7 @@ class MY_BasicModel extends CI_Model
         $this->db->reconnect();
         if ($this->db->conn_id === false) {
             $this->db->db_connect();
+            $this->setSqlMode();
         }
     }
 
