@@ -10,10 +10,14 @@ function isChecked($key, &$record, $value = true)
 
 function formValue($key, $record, $default = '')
 {
-    if (! array_key_exists($key, $record)) {
-        return $default;
+    if (!array_key_exists($key, $record)) {
+        return html_escape($default);
     }
-    return html_escape($record[$key]);
+    $value = $record[$key];
+    if (is_object($value) && ($value instanceof DateTime)) {
+        $value = $value->format('Y-m-d');
+    }
+    return html_escape($value);
 }
 
 
