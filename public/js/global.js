@@ -1,13 +1,23 @@
-function html_escape(value) {
+function html_escape(value)
+{
     return $('<pre/>').text(value).html().replace(/"/g, '&quot;');
 }
 
-function real_typeof(v) {
+function real_typeof(v)
+{
     if (typeof(v) == "object") {
-        if (v === null) return "null";
-        if (v instanceof Array) return "array";
-        if (v instanceof Date) return "date";
-        if (v instanceof RegExp) return "regex";
+        if (v === null) {
+            return "null";
+        }
+        if (v instanceof Array) {
+            return "array";
+        }
+        if (v instanceof Date) {
+            return "date";
+        }
+        if (v instanceof RegExp) {
+            return "regex";
+        }
         return "object";
     }
 

@@ -5,40 +5,45 @@
  *
  * If you don't want any of this additional functionality, I recommend you extend MY_BasicModel instead.
  */
-class MY_Model extends MY_BasicModel {
+class MY_Model extends MY_BasicModel
+{
 
     /**
      * @var string What is the table name for this table?
      */
-    protected $table = NULL;
+    protected $table = null;
 
     /**
      * @var string What is the primary key for this table?
      */
-    protected $keyField = NULL;
+    protected $keyField = null;
 
     /**
      * @var bool Does this table use soft deletes? (Have a 'deleted' boolean column)
      */
-    protected $softDelete = TRUE;
+    protected $softDelete = true;
 
     /**
      * @var bool Does this table have dt_created and dt_deleted fields?
      */
-    protected $hasDtFields = TRUE;
+    protected $hasDtFields = true;
 
     /**
      * @var bool Does this table has a dt_modified field?
      */
-    protected $hasDtModified = FALSE;
+    protected $hasDtModified = false;
 
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Due to a quirk in the way CI loads models, we have to check what class we're an instance of here
-        if ((get_class($this) != 'MY_Model') && (($this->table === NULL) || ($this->keyField === NULL))) {
-            trigger_error("Table or KeyField properties not set. Did you want to use MY_BasicModel instead?", E_USER_NOTICE);
+        if ((get_class($this) != 'MY_Model') && (($this->table === null) || ($this->keyField === null))) {
+            trigger_error(
+                "Table or KeyField properties not set. Did you want to use MY_BasicModel instead?",
+                E_USER_NOTICE
+            );
         }
     }
 
@@ -48,13 +53,14 @@ class MY_Model extends MY_BasicModel {
      * @param bool $includeDeleted If soft deletion is enabled, allow deleted items to be returned.
      * @return null|object
      */
-    public function get($id, $includeDeleted = FALSE) {
+    public function get($id, $includeDeleted = false)
+    {
         $where = array($this->keyField => $id);
-        if ((!$includeDeleted) && $this->softDelete) {
-            $where['deleted'] = FALSE;
+        if ((! $includeDeleted) && $this->softDelete) {
+            $where['deleted'] = false;
         }
         $resultSet = $this->db->get_where($this->table, $where, 1);
-        return (is_object($resultSet) && ($resultSet->num_rows() > 0)) ? $resultSet->row() : NULL;
+        return (is_object($resultSet) && ($resultSet->num_rows() > 0)) ? $resultSet->row() : null;
     }
 
 
@@ -62,9 +68,10 @@ class MY_Model extends MY_BasicModel {
      * @param array $record
      * @return int New record ID
      */
-    public function add(array $record) {
+    public function add(array $record)
+    {
         if ($this->hasDtFields) {
-            $this->db->set('dt_created', 'NOW()', FALSE);
+            $this->db->set('dt_created', 'NOW()', false);
         }
         $this->db->insert($this->table, $record);
         return $this->db->insert_id();
@@ -76,28 +83,30 @@ class MY_Model extends MY_BasicModel {
      * @param array $record
      * @return int Affected rows
      */
-    public function update($id, array $record) {
-        $limit = NULL;
+    public function update($id, array $record)
+    {
+        $limit = null;
         $where = $id;
-        if (!is_array($id)) {
+        if (! is_array($id)) {
             $where = array($this->keyField => $id);
             $limit = 1;
         }
 
         if ($this->hasDtModified) {
-            $this->db->set('dt_modified', 'NOW()', FALSE);
+            $this->db->set('dt_modified', 'NOW()', false);
         }
         $this->db->update($this->table, $record, $where, $limit);
         return $this->db->affected_rows();
     }
 
 
-    public function delete($id) {
+    public function delete($id)
+    {
         if ($this->softDelete) {
             if ($this->hasDtFields) {
-                $this->db->set('dt_deleted', 'NOW()', FALSE);
+                $this->db->set('dt_deleted', 'NOW()', false);
             }
-            $this->db->update($this->table, array('deleted' => TRUE), array($this->keyField => $id), 1);
+            $this->db->update($this->table, array('deleted' => true), array($this->keyField => $id), 1);
         } else {
             $this->db->delete($this->table, array($this->keyField => $id), 1);
         }
@@ -109,13 +118,14 @@ class MY_Model extends MY_BasicModel {
      * @param array $searchParams Search Parameters
      * @return CI_DB_Result|null|bool
      */
-    public function fetchBySearch(array $searchParams) {
+    public function fetchBySearch(array $searchParams)
+    {
         $table = $this->table;
         $this->db->from($table);
-        $limit = NULL;
+        $limit = null;
         $offset = '';
-        $orderBy = NULL;
-        $deleted = FALSE;
+        $orderBy = null;
+        $deleted = false;
         $fields = array("`{$table}`.*");
         $action = 'select';
 
@@ -156,7 +166,7 @@ class MY_Model extends MY_BasicModel {
                     break;
 
                 case 'fields':
-                    if (!is_array($value)) {
+                    if (! is_array($value)) {
                         return $this->returnError("Value for parameter 'fields' must be an array");
                     }
                     $fields = $value;
@@ -181,15 +191,15 @@ class MY_Model extends MY_BasicModel {
             }
         }
 
-        if (($this->softDelete) && ($deleted !== NULL)) {
+        if (($this->softDelete) && ($deleted !== null)) {
             $this->db->where('deleted', ($deleted ? 1 : 0));
         }
 
         $this->db->select(array_reverse($fields));
-        if ($limit !== NULL) {
+        if ($limit !== null) {
             $this->db->limit($limit, $offset);
         }
-        if ($orderBy !== NULL) {
+        if ($orderBy !== null) {
             $this->db->order_by($orderBy);
         }
 
@@ -205,7 +215,7 @@ class MY_Model extends MY_BasicModel {
 
             case 'select':
                 $resultSet = $this->db->get();
-                return (is_object($resultSet) && ($resultSet->num_rows() > 0)) ? $resultSet : NULL;
+                return (is_object($resultSet) && ($resultSet->num_rows() > 0)) ? $resultSet : null;
 
             default:
                 return $this->returnError("Invalid action specified: {$action}");
@@ -213,11 +223,11 @@ class MY_Model extends MY_BasicModel {
     }
 
 
-    public function countAll() {
+    public function countAll()
+    {
         if ($this->softDelete) {
-            $this->db->where('deleted', FALSE);
+            $this->db->where('deleted', false);
         }
         return $this->db->count_all_results($this->table);
     }
-
 }

@@ -7,10 +7,11 @@
  * http://php.net/json_last_error_msg
  * @version 5.5.0
  */
-if (!function_exists('json_last_error_msg')) {
-    function json_last_error_msg() {
+if (! function_exists('json_last_error_msg')) {
+    function json_last_error_msg()
+    {
         static $errors = array(
-            JSON_ERROR_NONE => NULL,
+            JSON_ERROR_NONE => null,
             JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
             JSON_ERROR_STATE_MISMATCH => 'Underflow or the modes mismatch',
             JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',

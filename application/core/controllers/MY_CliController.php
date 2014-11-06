@@ -5,7 +5,8 @@
  *
  * @property Logger $logger
  */
-class MY_CliController extends MY_Controller {
+class MY_CliController extends MY_Controller
+{
 
     /**
      * @var array Arguments passed from the commandline
@@ -13,13 +14,14 @@ class MY_CliController extends MY_Controller {
     protected $cliArgs = array();
 
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         ini_set("max_execution_time", "0");
         set_time_limit(0);
 
-        if (! $this->input->is_cli_request() ) {
+        if (! $this->input->is_cli_request()) {
             header("HTTP/1.1 403 Forbidden");
             die();
         }
@@ -33,7 +35,8 @@ class MY_CliController extends MY_Controller {
     }
 
 
-    protected function getArgs() {
+    protected function getArgs()
+    {
         // I would use getopt() here, but it seems to be broken under CodeIgniter for some reason
         global $argv;
         $cliArgs = array();
@@ -44,7 +47,7 @@ class MY_CliController extends MY_Controller {
 
             $parts = explode('=', $arg, 2);
             $key = $parts[0];
-            $value = NULL;
+            $value = null;
             if (count($parts) > 1) {
                 $value = $parts[1];
             }
@@ -62,7 +65,8 @@ class MY_CliController extends MY_Controller {
     }
 
 
-    protected function parseCliArgs() {
+    protected function parseCliArgs()
+    {
         if (is_array($this->cliArgs)) {
             if (array_key_exists('verbose', $this->cliArgs)) {
                 $this->logger->setLogToConsole();
@@ -74,8 +78,8 @@ class MY_CliController extends MY_Controller {
     }
 
 
-    protected function printUsage() {
+    protected function printUsage()
+    {
         die("Not implemented");
     }
-
 }

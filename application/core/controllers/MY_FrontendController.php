@@ -3,7 +3,8 @@
 /**
  * All frontend controllers should extend this.
  */
-class MY_FrontendController extends MY_Controller {
+class MY_FrontendController extends MY_Controller
+{
 
     /**
      * @var string Page layout to use - either 'normal' or 'minimal' (login page / errors)
@@ -20,7 +21,8 @@ class MY_FrontendController extends MY_Controller {
     protected $jsFiles = array();
 
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->loadSession();
@@ -35,9 +37,11 @@ class MY_FrontendController extends MY_Controller {
     /**
      * Display the layout header
      * This method avoids the seperation of header and footer views, which breaks code hilighting / tag matching
+     *
      * @param array $vars Variables to pass to view
      */
-    protected function displayLayoutHead(array $vars = array()) {
+    protected function displayLayoutHead(array $vars = array())
+    {
         $this->load->vars('crumbs', $this->crumbs);
         $this->load->vars('cssFiles', $this->cssFiles);
         $this->load->vars('jsFiles', $this->jsFiles);
@@ -65,7 +69,7 @@ class MY_FrontendController extends MY_Controller {
 
         ob_start();
         print '<!-- HEAD START -->';
-        $buffer = $this->load->view('layout/'. $this->layout, $vars, TRUE);
+        $buffer = $this->load->view('layout/' . $this->layout, $vars, true);
         $buffer = str_replace(array("\r\n", "\r"), "\n", $buffer);
         $buffer = explode("\n", $buffer);
         foreach ($buffer as &$line) {
@@ -84,18 +88,20 @@ class MY_FrontendController extends MY_Controller {
     /**
      * Display the layout footer
      * This method avoids the seperation of header and footer views, which breaks code hilighting / tag matching
+     *
      * @param array $vars Variables to pass to view
      */
-    protected function displayLayoutFoot(array $vars = array()) {
+    protected function displayLayoutFoot(array $vars = array())
+    {
         ob_start();
         print '<!-- FOOT START -->';
-        $buffer = $this->load->view('layout/'. $this->layout, $vars, TRUE);
+        $buffer = $this->load->view('layout/' . $this->layout, $vars, true);
         $buffer = str_replace(array("\r\n", "\r"), "\n", $buffer);
         $buffer = explode("\n", $buffer);
-        $printing = FALSE;
+        $printing = false;
         foreach ($buffer as &$line) {
             if (trim($line) == '<!-- TEMPLATE_MARKER: Content -->') {
-                $printing = TRUE;
+                $printing = true;
             }
 
             if ($printing) {
@@ -108,7 +114,9 @@ class MY_FrontendController extends MY_Controller {
         return;
     }
 
-    protected function addCrumb($title, $url = NULL, $icon = NULL) {
+
+    protected function addCrumb($title, $url = null, $icon = null)
+    {
         $this->crumbs[] = array(
             'title' => $title,
             'url' => $url,
@@ -117,35 +125,43 @@ class MY_FrontendController extends MY_Controller {
     }
 
 
-    protected function setSidebar($sidebar) {
-        $this->load->vars(array(
-            'showSidebar' => TRUE,
-            'sidebar' => $sidebar,
-        ));
+    protected function setSidebar($sidebar)
+    {
+        $this->load->vars(
+            array(
+                'showSidebar' => true,
+                'sidebar' => $sidebar,
+            )
+        );
     }
 
 
-    protected function setActiveSection($section) {
+    protected function setActiveSection($section)
+    {
         $this->load->vars('activeSection', $section);
     }
 
 
-    protected function setActiveSubsection($section) {
+    protected function setActiveSubsection($section)
+    {
         $this->load->vars('activeSubsection', $section);
     }
 
 
-    protected function setActiveSubsubsection($section) {
+    protected function setActiveSubsubsection($section)
+    {
         $this->load->vars('activeSubsubsection', $section);
     }
 
 
-    protected function addCssFile($filename) {
+    protected function addCssFile($filename)
+    {
         $this->cssFiles[] = array('filename' => $filename);
     }
 
-    protected function addJsFile($filename) {
+
+    protected function addJsFile($filename)
+    {
         $this->jsFiles[] = array('filename' => $filename);
     }
-
 }

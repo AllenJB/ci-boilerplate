@@ -1,28 +1,34 @@
 <?php
 
-class MY_BasicModel extends CI_Model {
+class MY_BasicModel extends CI_Model
+{
 
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
 
     /**
      * Return the last DB error
+     *
      * @return string|null Last DB error
      */
-    public function lastError() {
+    public function lastError()
+    {
         $errNo = $this->db->_error_number();
-        return  ($errNo > 0) ? $errNo .' :: '. $this->db->_error_message() : NULL;
+        return ($errNo > 0) ? $errNo . ' :: ' . $this->db->_error_message() : null;
     }
 
 
     /**
      * Return the last SQL query that was executed
+     *
      * @return string Last query SQL
      */
-    public function lastQuery() {
+    public function lastQuery()
+    {
         return $this->db->last_query();
     }
 
@@ -30,9 +36,10 @@ class MY_BasicModel extends CI_Model {
     /**
      * Reconnect the database
      */
-    public function reconnect() {
+    public function reconnect()
+    {
         $this->db->reconnect();
-        if ($this->db->conn_id === FALSE) {
+        if ($this->db->conn_id === false) {
             $this->db->db_connect();
         }
     }
@@ -41,13 +48,15 @@ class MY_BasicModel extends CI_Model {
     /**
      * Trigger a database error.
      * This method additionally attempts to reset the active query state.
+     *
      * @param string $msg Error message
      * @return bool FALSE
      */
-    public function returnError($msg) {
+    public function returnError($msg)
+    {
         trigger_error($msg, E_USER_ERROR);
         $this->db->reset();
-        return FALSE;
+        return false;
     }
 
 
@@ -59,13 +68,13 @@ class MY_BasicModel extends CI_Model {
      * @param array $array Input
      * @return array Escaped array
      */
-    protected function escapeArray(array $array) {
+    protected function escapeArray(array $array)
+    {
         foreach ($array as $key => $value) {
-            if (! (is_array($value) || is_object($value)) ) {
+            if (! (is_array($value) || is_object($value))) {
                 $array[$key] = $this->db->escape($value);
             }
         }
         return $array;
     }
-
 }

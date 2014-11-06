@@ -3,51 +3,52 @@
 /**
  * REST Client library
  */
-class Rest {
+class Rest
+{
 
     /**
      * @var null|string Cookie storage location
      */
-    protected $cookieDir = NULL;
+    protected $cookieDir = null;
 
     /**
      * @var null|string Accept HTTP header for the request
      */
-    protected $accept = NULL;
+    protected $accept = null;
 
     /**
      * @var null|string Content-Type HTTP header for the request
      */
-    protected $contentType = NULL;
+    protected $contentType = null;
 
     /**
      * @var null|string Last request error
      */
-    protected $lastError = NULL;
+    protected $lastError = null;
 
     /**
      * @var null|array curl_geptopt info for the last request
      */
-    protected $lastRequestInfo = NULL;
+    protected $lastRequestInfo = null;
 
     /**
      * @var null|array HTTP Headers for the last response
      */
-    protected $lastResponseHeaders = NULL;
+    protected $lastResponseHeaders = null;
 
 
     /**
      * @var null|string Complete last response
      */
-    protected $lastResponse = NULL;
+    protected $lastResponse = null;
 
 
-    protected $lastRequestData = NULL;
+    protected $lastRequestData = null;
 
 
-    protected $caBundle = NULL;
+    protected $caBundle = null;
 
-    protected $errorLogFh = NULL;
+    protected $errorLogFh = null;
 
     protected $connectTimeout = 10;
 
@@ -59,70 +60,82 @@ class Rest {
      *
      * Sets the default cookie directory (is the DATA_DIR constant is set)
      */
-    public function __construct() {
+    public function __construct()
+    {
         if (defined('DATA_DIR')) {
-            $this->cookieDir = DATA_DIR .'/curl/cookies';
+            $this->cookieDir = DATA_DIR . '/curl/cookies';
         }
     }
 
 
     /**
      * Set the Accept header for subsequent requests
+     *
      * @param string $mimetype Mime Type
      */
-    public function setAccept($mimetype) {
+    public function setAccept($mimetype)
+    {
         $this->accept = $mimetype;
     }
 
 
     /**
      * Set the Content-Type header for subsequent requests
+     *
      * @param string $mimeType Mime Type
      */
-    public function setContentType($mimeType) {
+    public function setContentType($mimeType)
+    {
         $this->contentType = $mimeType;
     }
 
-    public function setCABundle($file) {
+
+    public function setCABundle($file)
+    {
         $this->caBundle = $file;
     }
 
 
-    public function setConnectTimeout($secs) {
+    public function setConnectTimeout($secs)
+    {
         $this->connectTimeout = $secs;
     }
 
-    public function setTimeout($secs) {
+
+    public function setTimeout($secs)
+    {
         $this->timeout = $secs;
     }
 
 
     /**
      * Initialize a curl object with our default option set
+     *
      * @return resource Curl handle
      */
-    protected function initCurl() {
+    protected function initCurl()
+    {
         $ch = curl_init();
         // 2013-09-30 Curl seems to be broken on live servers
         // Using VERIFYHOST 2 AND a caBundle works fine on my dev box, but not on live.
 //        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        if ($this->caBundle !== NULL) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        if ($this->caBundle !== null) {
             curl_setopt($ch, CURLOPT_CAINFO, $this->caBundle);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if ($this->cookieDir !== NULL) {
+        if ($this->cookieDir !== null) {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookieDir);
         }
-        curl_setopt($ch, CURLOPT_HEADER, TRUE);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-        curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
         if (defined('CURLOPT_CERTINFO')) {
-            curl_setopt($ch, CURLOPT_CERTINFO, TRUE);
+            curl_setopt($ch, CURLOPT_CERTINFO, true);
         }
-        if (!is_resource($this->errorLogFh)) {
-            $this->errorLogFh = fopen(DATA_DIR .'/curl/error.log', 'w+');
+        if (! is_resource($this->errorLogFh)) {
+            $this->errorLogFh = fopen(DATA_DIR . '/curl/error.log', 'w+');
         }
         curl_setopt($ch, CURLOPT_STDERR, $this->errorLogFh);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectTimeout);
@@ -140,15 +153,16 @@ class Rest {
      *
      * @param resource $ch Curl handle
      */
-    protected function setCurlHeaders(&$ch) {
-        $headers = array (
+    protected function setCurlHeaders(&$ch)
+    {
+        $headers = array(
             'Expect:'
         );
-        if ($this->accept !== NULL) {
-            $headers[] = 'Accept: '. $this->accept;
+        if ($this->accept !== null) {
+            $headers[] = 'Accept: ' . $this->accept;
         }
-        if ($this->contentType !== NULL) {
-            $headers[] = 'Content-Type: '. $this->contentType;
+        if ($this->contentType !== null) {
+            $headers[] = 'Content-Type: ' . $this->contentType;
         }
         if (count($headers)) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -159,12 +173,13 @@ class Rest {
     /**
      * Reset the last response values
      */
-    protected function reset() {
-        $this->lastError = NULL;
-        $this->lastRequestInfo = NULL;
-        $this->lastResponseHeaders = NULL;
-        $this->lastResponse = NULL;
-        $this->lastRequestData = NULL;
+    protected function reset()
+    {
+        $this->lastError = null;
+        $this->lastRequestInfo = null;
+        $this->lastResponseHeaders = null;
+        $this->lastResponse = null;
+        $this->lastRequestData = null;
     }
 
 
@@ -174,7 +189,8 @@ class Rest {
      * @param resource $ch Curl handle
      * @return bool|mixed Response body, or FALSE on error
      */
-    protected function curlExecute(&$ch) {
+    protected function curlExecute(&$ch)
+    {
         $this->setCurlHeaders($ch);
 
         $page = curl_exec($ch);
@@ -186,7 +202,7 @@ class Rest {
 
         if (strlen($error) > 0) {
             $this->lastError = $error;
-            return FALSE;
+            return false;
         }
 
         $responseParts = explode("\r\n\r\n", $page);
@@ -208,13 +224,13 @@ class Rest {
             $key = $headerParts[0];
             $value = $headerParts[1];
 
-            if (!array_key_exists($key, $this->lastResponseHeaders)) {
+            if (! array_key_exists($key, $this->lastResponseHeaders)) {
                 $this->lastResponseHeaders[$key] = $value;
                 continue;
             }
 
-            if (!is_array($this->lastResponseHeaders[$key])) {
-                $this->lastResponseHeaders[$key] = array ($this->lastResponseHeaders[$key]);
+            if (! is_array($this->lastResponseHeaders[$key])) {
+                $this->lastResponseHeaders[$key] = array($this->lastResponseHeaders[$key]);
             }
             $this->lastResponseHeaders[$key][] = $value;
         }
@@ -229,7 +245,8 @@ class Rest {
      * @param string $url Request URL
      * @return bool|mixed Response, or FALSE on error
      */
-    public function restGet($url) {
+    public function restGet($url)
+    {
         $this->reset();
 
         $ch = $this->initCurl();
@@ -247,7 +264,8 @@ class Rest {
      * @param array|string $postFields POST data to send
      * @return bool|mixed Response, or FALSE on error
      */
-    public function restPost($url, $postFields = NULL) {
+    public function restPost($url, $postFields = null)
+    {
         $this->reset();
         $this->lastRequestData = $postFields;
 
@@ -274,14 +292,15 @@ class Rest {
      * @param null|string $body Data to PUT
      * @return bool|mixed Response, or FALSE on error
      */
-    public function restPut($url, $body = NULL) {
+    public function restPut($url, $body = null)
+    {
         $this->reset();
         $this->lastRequestData = $body;
 
         $fp = fopen('php://temp/maxmemory:256000', 'w');
-        if (!$fp) {
+        if (! $fp) {
             trigger_error("Unable to write body to memory", E_USER_ERROR);
-            return FALSE;
+            return false;
         }
         fwrite($fp, $body);
         fseek($fp, 0);
@@ -289,7 +308,7 @@ class Rest {
 
         $ch = $this->initCurl();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_PUT, TRUE);
+        curl_setopt($ch, CURLOPT_PUT, true);
         curl_setopt($ch, CURLOPT_INFILE, $fp);
         curl_setopt($ch, CURLOPT_INFILESIZE, $stat['size']);
 
@@ -303,7 +322,8 @@ class Rest {
      * @param string $url URL
      * @return bool|mixed Response, or FALSE on error
      */
-    public function restDelete($url) {
+    public function restDelete($url)
+    {
         $this->reset();
 
         $ch = $this->initCurl();
@@ -319,18 +339,21 @@ class Rest {
      *
      * @return null|string Error message
      */
-    public function getLastError() {
+    public function getLastError()
+    {
         return $this->lastError;
     }
 
 
     /**
      * Return the HTTP code for the last response
+     *
      * @return null|string HTTP error code
      */
-    public function getResponseHttpCode() {
-        if (!is_array($this->lastRequestInfo)) {
-            return NULL;
+    public function getResponseHttpCode()
+    {
+        if (! is_array($this->lastRequestInfo)) {
+            return null;
         }
 
         return $this->lastRequestInfo['http_code'];
@@ -342,9 +365,10 @@ class Rest {
      *
      * @return null|string HTTP content type
      */
-    public function getResponseContentType() {
-        if (!is_array($this->lastRequestInfo)) {
-            return NULL;
+    public function getResponseContentType()
+    {
+        if (! is_array($this->lastRequestInfo)) {
+            return null;
         }
 
         return $this->lastRequestInfo['content_type'];
@@ -359,22 +383,26 @@ class Rest {
      *
      * @return array|null HTTP Headers
      */
-    public function getResponseHeaders() {
+    public function getResponseHeaders()
+    {
         return $this->lastResponseHeaders;
     }
 
 
-    public function getLastResponse() {
+    public function getLastResponse()
+    {
         return $this->lastResponse;
     }
 
-    public function getLastRequestInfo() {
+
+    public function getLastRequestInfo()
+    {
         return $this->lastRequestInfo;
     }
 
 
-    public function getLastRequestData() {
+    public function getLastRequestData()
+    {
         return $this->lastRequestData;
     }
-
 }

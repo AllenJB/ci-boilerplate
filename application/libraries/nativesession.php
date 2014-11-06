@@ -1,4 +1,4 @@
-<?php  if (!defined('BASEPATH')) {
+<?php  if (! defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
@@ -7,7 +7,8 @@
  *
  * Partially based on the CI 3.0 sessions code
  */
-class NativeSession {
+class NativeSession
+{
 
     public $sess_time_to_update = 300;
 
@@ -39,7 +40,8 @@ class NativeSession {
     const TEMP_EXP_DEF = 300;
 
 
-    function __construct(array $params = array()) {
+    function __construct(array $params = array())
+    {
         $this->now = time();
 
         $this->CI =& get_instance();
@@ -67,13 +69,28 @@ class NativeSession {
     }
 
 
-    protected function initialize() {
+    protected function initialize()
+    {
         // Get config parameters
         $config = array();
-        $prefs = array('sess_cookie_name', 'sess_expire_on_close', 'sess_expiration', 'sess_match_ip', 'sess_match_useragent', 'sess_time_to_update', 'cookie_prefix', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly');
+        $prefs = array(
+            'sess_cookie_name',
+            'sess_expire_on_close',
+            'sess_expiration',
+            'sess_match_ip',
+            'sess_match_useragent',
+            'sess_time_to_update',
+            'cookie_prefix',
+            'cookie_path',
+            'cookie_domain',
+            'cookie_secure',
+            'cookie_httponly'
+        );
 
         foreach ($prefs as $key) {
-            $config[$key] = (array_key_exists($key, $this->params) ? $this->params[$key] : $this->CI->config->item($key));
+            $config[$key] = (array_key_exists($key, $this->params) ? $this->params[$key] : $this->CI->config->item(
+                $key
+            ));
         }
 
         // Set session name, if specified
@@ -91,8 +108,8 @@ class NativeSession {
         $expire = 7200;
         $path = '/';
         $domain = '';
-        $secure = (bool)$config['cookie_secure'];
-        $http_only = (bool)$config['cookie_httponly'];
+        $secure = (bool) $config['cookie_secure'];
+        $http_only = (bool) $config['cookie_httponly'];
 
         if ($config['sess_expiration'] !== false) {
             // Default to 2 years if expiration is "0"
@@ -123,10 +140,15 @@ class NativeSession {
         if (isset($_SESSION['last_activity']) && (($_SESSION['last_activity'] + $expire) < $now OR $_SESSION['last_activity'] > $now)) {
             // Expired - destroy
             $destroy = true;
-        } elseif ($config['sess_match_ip'] === true && isset($_SESSION['ip_address']) && $_SESSION['ip_address'] !== $this->CI->input->ip_address()) {
+        } elseif ($config['sess_match_ip'] === true && isset($_SESSION['ip_address']) && $_SESSION['ip_address'] !== $this->CI->input->ip_address(
+            )
+        ) {
             // IP doesn't match - destroy
             $destroy = true;
-        } elseif ($config['sess_match_useragent'] === true && isset($_SESSION['user_agent']) && $_SESSION['user_agent'] !== trim(substr($this->CI->input->user_agent(), 0, 50))) {
+        } elseif ($config['sess_match_useragent'] === true && isset($_SESSION['user_agent']) && $_SESSION['user_agent'] !== trim(
+                substr($this->CI->input->user_agent(), 0, 50)
+            )
+        ) {
             // Agent doesn't match - destroy
             $destroy = true;
         }
@@ -141,7 +163,7 @@ class NativeSession {
         // Check for update time
         if ($config['sess_time_to_update'] && isset($_SESSION['last_activity']) && ($_SESSION['last_activity'] + $config['sess_time_to_update']) < $now) {
             // Changing the session ID amidst a series of AJAX calls causes problems
-            if (!$this->CI->input->is_ajax_request()) {
+            if (! $this->CI->input->is_ajax_request()) {
                 // Regenerate ID, but don't destroy session
                 $this->sess_regenerate(false);
             }
@@ -151,12 +173,12 @@ class NativeSession {
         $_SESSION['last_activity'] = $now;
 
         // Set matching values as required
-        if ($config['sess_match_ip'] === true && !isset($_SESSION['ip_address'])) {
+        if ($config['sess_match_ip'] === true && ! isset($_SESSION['ip_address'])) {
             // Store user IP address
             $_SESSION['ip_address'] = $this->CI->input->ip_address();
         }
 
-        if ($config['sess_match_useragent'] === true && !isset($_SESSION['user_agent'])) {
+        if ($config['sess_match_useragent'] === true && ! isset($_SESSION['user_agent'])) {
             // Store user agent string
             $_SESSION['user_agent'] = trim(substr($this->CI->input->user_agent(), 0, 50));
         }
@@ -169,14 +191,16 @@ class NativeSession {
     /**
      * Regenerates session id
      */
-    public function sess_regenerate() {
+    public function sess_regenerate()
+    {
         session_regenerate_id(true);
         $_SESSION['regenerated'] = time();
         $_SESSION['last_activity'] = time();
     }
 
 
-    public function sess_create() {
+    public function sess_create()
+    {
         if (session_id() === '') {
             session_start();
         }
@@ -184,10 +208,12 @@ class NativeSession {
         $_SESSION['last_activity'] = time();
     }
 
+
     /**
      * Destroys the session and erases session storage
      */
-    public function sess_destroy() {
+    public function sess_destroy()
+    {
         unset($_SESSION);
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time() - 42000, '/');
@@ -196,7 +222,8 @@ class NativeSession {
     }
 
 
-    public function sess_update() {
+    public function sess_update()
+    {
         if (($_SESSION['last_activity'] + $this->sess_time_to_update) >= $this->now) {
             return;
         }
@@ -208,12 +235,13 @@ class NativeSession {
     /**
      * Reads given session attribute value
      */
-    public function userdata($item, $default = FALSE) {
+    public function userdata($item, $default = false)
+    {
         if ($item == 'session_id') { //added for backward-compatibility
             return session_id();
         }
 
-        if (!array_key_exists($item, $_SESSION)) {
+        if (! array_key_exists($item, $_SESSION)) {
             // FALSE value keeps compatibility with CI_Session
             return $default;
         }
@@ -222,7 +250,8 @@ class NativeSession {
     }
 
 
-    public function all_userdata() {
+    public function all_userdata()
+    {
         return $_SESSION;
     }
 
@@ -230,7 +259,8 @@ class NativeSession {
     /**
      * Sets session attributes to the given values
      */
-    public function set_userdata($newdata = array(), $newval = '') {
+    public function set_userdata($newdata = array(), $newval = '')
+    {
         $_SESSION['last_activity'] = time();
 
         if (is_string($newdata)) {
@@ -244,10 +274,12 @@ class NativeSession {
         }
     }
 
+
     /**
      * Erases given session attributes
      */
-    public function unset_userdata($newdata = array()) {
+    public function unset_userdata($newdata = array())
+    {
         $_SESSION['last_activity'] = time();
 
         if (is_string($newdata)) {
@@ -267,7 +299,8 @@ class NativeSession {
      *
      * @return    array    Flash data array
      */
-    public function all_flashdata() {
+    public function all_flashdata()
+    {
         $out = array();
 
         // loop through all userdata
@@ -281,6 +314,7 @@ class NativeSession {
         return $out;
     }
 
+
     /**
      * Add or change flashdata, only available until the next request
      *
@@ -288,7 +322,8 @@ class NativeSession {
      * @param    string $newval Item value or empty string
      * @return    void
      */
-    public function set_flashdata($newdata = array(), $newval = '') {
+    public function set_flashdata($newdata = array(), $newval = '')
+    {
         $_SESSION['last_activity'] = time();
 
         // Wrap item as array if singular
@@ -312,7 +347,8 @@ class NativeSession {
      * @param    mixed $key Item key(s)
      * @return    void
      */
-    public function keep_flashdata($key) {
+    public function keep_flashdata($key)
+    {
         $_SESSION['last_activity'] = time();
 
         if (is_array($key)) {
@@ -340,7 +376,8 @@ class NativeSession {
      * @param mixed $default Default return value if no value found
      * @return    string
      */
-    public function flashdata($key, $default = FALSE) {
+    public function flashdata($key, $default = false)
+    {
         $_SESSION['last_activity'] = time();
         // Prepend key and retrieve value
         $flashdata_key = self::FLASHDATA_KEY . self::FLASHDATA_OLD . $key;
@@ -356,7 +393,8 @@ class NativeSession {
      *
      * @return    void
      */
-    protected function _flashdata_mark() {
+    protected function _flashdata_mark()
+    {
         foreach ($this->all_userdata() as $name => $value) {
             $parts = explode(self::FLASHDATA_NEW, $name);
             if (count($parts) === 2) {
@@ -373,7 +411,8 @@ class NativeSession {
      *
      * @return    void
      */
-    protected function _flashdata_sweep() {
+    protected function _flashdata_sweep()
+    {
         $userdata = $this->all_userdata();
         foreach (array_keys($userdata) as $key) {
             if (strpos($key, self::FLASHDATA_OLD)) {
@@ -383,12 +422,14 @@ class NativeSession {
     }
 
 
-    public function sess_read() {
+    public function sess_read()
+    {
         trigger_error("Unimplemented", E_USER_NOTICE);
     }
 
-    public function sess_write() {
+
+    public function sess_write()
+    {
         trigger_error("Unimplemented", E_USER_NOTICE);
     }
-
 }

@@ -1,11 +1,13 @@
 <?php
 
-class Date {
+class Date
+{
 
     /**
      * @var string Short date format - used for both input from forms and output
      */
     protected $formatShort = 'Y-m-d';
+
     /**
      * @var string Short date format for JS - used for datepickers / JS code
      * Short JS MUST produce the same format as Short above or datepickers will break everything!
@@ -30,7 +32,7 @@ class Date {
     protected $defaultFormat = 'short';
 
 
-    protected $iso8601_dayOfWeek = array (
+    protected $iso8601_dayOfWeek = array(
         1 => 'Monday',
         2 => 'Tuesday',
         3 => 'Wednesday',
@@ -40,11 +42,14 @@ class Date {
         7 => 'Sunday'
     );
 
-    public function __construct() {
+
+    public function __construct()
+    {
     }
 
 
-    public function setDefaultFormat($format) {
+    public function setDefaultFormat($format)
+    {
         $retval = $this->defaultFormat;
         $this->defaultFormat = $format;
         return $retval;
@@ -57,26 +62,28 @@ class Date {
      * If the given date/time is invalid, returns FALSE
      *
      * @param string|DateTime $datetime
-     * @param object|bool|string $default Default return value is date fails to parse. If 'NOW', will use the current date/time
+     * @param object|bool|string $default Default return value is date fails to parse. If 'NOW', will use the current
+     *     date/time
      * @param string $format
      * @param bool $time
      * @return string|bool Formatted datetime or FALSE on error
      */
-    public function display($datetime, $default = FALSE, $format = NULL, $time = FALSE) {
+    public function display($datetime, $default = false, $format = null, $time = false)
+    {
         $retVal = $default;
         if ($default === 'NOW()' || $default === 'NOW') {
             $retVal = new DateTime();
         }
-        if ($format === NULL) {
+        if ($format === null) {
             $format = $this->defaultFormat;
         }
 
-        if ((!is_object($datetime)) && strlen($datetime)) {
+        if ((! is_object($datetime)) && strlen($datetime)) {
             if (($datetime == '0000-00-00') || ($datetime == '0000-00-00 00:00:00')) {
-                return FALSE;
+                return false;
             }
             $instring = $datetime;
-            $datetime = NULL;
+            $datetime = null;
             try {
                 $datetime = new DateTime($instring);
             } catch (Exception $e) {
@@ -86,12 +93,12 @@ class Date {
 
         $formatString = $this->getFormat($format, $time);
 
-        if (! (is_object($datetime) && strlen($formatString)) ) {
+        if (! (is_object($datetime) && strlen($formatString))) {
             if (is_object($retVal)) {
                 if (strlen($formatString)) {
                     $retVal = $retVal->format($formatString);
                 } else {
-                    $retVal = FALSE;
+                    $retVal = false;
                 }
             }
             return $retVal;
@@ -101,19 +108,22 @@ class Date {
     }
 
 
-    public function displayDT($datetime, $default = FALSE, $format = NULL) {
-        return $this->display($datetime, $default, $format, TRUE);
+    public function displayDT($datetime, $default = false, $format = null)
+    {
+        return $this->display($datetime, $default, $format, true);
     }
 
 
     /**
      * Retrieve a specific format string
+     *
      * @param $format
      * @param bool $time
      * @return string
      */
-    public function getFormat($format = 'short', $time = FALSE) {
-        $formatString = NULL;
+    public function getFormat($format = 'short', $time = false)
+    {
+        $formatString = null;
         $format = strtolower(trim($format));
         switch ($format) {
             case 'short':
@@ -134,12 +144,12 @@ class Date {
 
             default:
                 trigger_error("Unrecognized format specified: {$format}");
-                return FALSE;
+                return false;
                 break;
         }
 
         if ($time) {
-            $formatString .= ' '. $this->formatTime;
+            $formatString .= ' ' . $this->formatTime;
         }
         return $formatString;
     }
@@ -156,22 +166,23 @@ class Date {
      * @param string $format Input format (usually 'short')
      * @return DateTime Validated date time object
      */
-    public function parse($datetime, $format = 'short') {
+    public function parse($datetime, $format = 'short')
+    {
         $formatString = $this->getFormat($format);
 
-        $dt = NULL;
+        $dt = null;
         try {
             $dt = DateTime::createFromFormat($formatString, $datetime);
         } catch (Exception $e) {
             // Do nothing
         }
-        if (!is_object($dt)) {
-            return FALSE;
+        if (! is_object($dt)) {
+            return false;
         }
 
         $compareString = $dt->format($formatString);
         if ($compareString != $datetime) {
-            return FALSE;
+            return false;
         }
 
         return $dt;
@@ -180,10 +191,11 @@ class Date {
 
     /**
      * Return an array of key value pairs for ISO8601 days of the week against English day names
+     *
      * @return array
      */
-    public function getDaysOfWeekForISO8601() {
+    public function getDaysOfWeekForISO8601()
+    {
         return $this->iso8601_dayOfWeek;
     }
-
 }

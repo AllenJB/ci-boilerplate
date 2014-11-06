@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?= (isset($PageTitle) ? html_escape($PageTitle). ' - ' : ''); ?>ProjectName</title>
+    <title><?= (isset($PageTitle) ? html_escape($PageTitle) . ' - ' : ''); ?>ProjectName</title>
 
     <meta charset="utf-8" />
 

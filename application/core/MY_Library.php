@@ -6,11 +6,13 @@
  * @property CI_Output $output
  * @property CI_Loader $load
  */
-class MY_Library {
+class MY_Library
+{
 
-    public function __construct() {
-
+    public function __construct()
+    {
     }
+
 
     /**
      * __get
@@ -18,12 +20,12 @@ class MY_Library {
      * Allows libraries to access CI's loaded classes using the same
      * syntax as controllers.
      *
-     * @param	string
+     * @param    string
      * @access private
      */
-    public function &__get($key) {
+    public function &__get($key)
+    {
         $CI =& get_instance();
         return $CI->$key;
     }
-
 }

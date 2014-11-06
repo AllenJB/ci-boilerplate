@@ -1,5 +1,5 @@
 <?php
-if ((!isset($flashMessages)) && isset($FlashMessages)) {
+if ((! isset($flashMessages)) && isset($FlashMessages)) {
     $flashMessages = $FlashMessages;
 }
 
@@ -11,14 +11,14 @@ if (isset($flashMessages) && is_array($flashMessages) && count($flashMessages)) 
         // but this method should ensure message types always appear in the same order
         $types = array('error', 'warning', 'success', 'info');
         foreach ($types as $type) {
-            if (!array_key_exists($type, $flashMessages)) {
+            if (! array_key_exists($type, $flashMessages)) {
                 continue;
             }
             $messages = $flashMessages[$type];
-            if (! (is_array($messages) && count($messages)) ) {
+            if (! (is_array($messages) && count($messages))) {
                 continue;
             }
-            $classList = array ('flash-message', $type, 'alert', 'alert-'. $type);
+            $classList = array('flash-message', $type, 'alert', 'alert-' . $type);
             if ($type == 'error') {
                 $classList[] = 'alert-danger';
             }
@@ -33,11 +33,11 @@ if (isset($flashMessages) && is_array($flashMessages) && count($flashMessages)) 
                     <span class="icon"></span>
                     <?= nl2br(html_escape($message)); ?>
                 </li>
-                <?php
+            <?php
             }
         }
 
         ?>
     </ul>
-    <?php
+<?php
 }

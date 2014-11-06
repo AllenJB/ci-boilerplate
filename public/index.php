@@ -20,7 +20,7 @@ date_default_timezone_set("Europe/London");
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-if (!defined('ENVIRONMENT')) {
+if (! defined('ENVIRONMENT')) {
     $environment = 'production';
     if (getenv('ENVIRONMENT') == 'development') {
         $environment = 'development';
@@ -44,22 +44,20 @@ if (!defined('ENVIRONMENT')) {
  * By default development will show errors but testing and live will hide them.
  */
 
-if (defined('ENVIRONMENT'))
-{
-	switch (ENVIRONMENT)
-	{
-		case 'development':
-			error_reporting(E_ALL);
-		break;
-	
-		case 'testing':
-		case 'production':
-			error_reporting(E_ALL);
-		break;
+if (defined('ENVIRONMENT')) {
+    switch (ENVIRONMENT) {
+        case 'development':
+            error_reporting(E_ALL);
+            break;
 
-		default:
-			exit('The application environment is not set correctly.');
-	}
+        case 'testing':
+        case 'production':
+            error_reporting(E_ALL);
+            break;
+
+        default:
+            exit('The application environment is not set correctly.');
+    }
 }
 
 /*
@@ -72,7 +70,7 @@ if (defined('ENVIRONMENT'))
  * as this file.
  *
  */
-	$system_path = '../system';
+$system_path = '../system';
 
 /*
  *---------------------------------------------------------------
@@ -88,7 +86,7 @@ if (defined('ENVIRONMENT'))
  * NO TRAILING SLASH!
  *
  */
-	$application_folder = '../application';
+$application_folder = '../application';
 
 /*
  * --------------------------------------------------------------------
@@ -110,15 +108,15 @@ if (defined('ENVIRONMENT'))
  * Un-comment the $routing array below to use this feature
  *
  */
-	// The directory name, relative to the "controllers" folder.  Leave blank
-	// if your controller is not in a sub-folder within the "controllers" folder
-	// $routing['directory'] = '';
+// The directory name, relative to the "controllers" folder.  Leave blank
+// if your controller is not in a sub-folder within the "controllers" folder
+// $routing['directory'] = '';
 
-	// The controller class file name.  Example:  Mycontroller
-	// $routing['controller'] = '';
+// The controller class file name.  Example:  Mycontroller
+// $routing['controller'] = '';
 
-	// The controller function you wish to be called.
-	// $routing['function']	= '';
+// The controller function you wish to be called.
+// $routing['function']	= '';
 
 
 /*
@@ -136,8 +134,7 @@ if (defined('ENVIRONMENT'))
  * Un-comment the $assign_to_config array below to use this feature
  *
  */
-	// $assign_to_config['name_of_config_item'] = 'value of config item';
-
+// $assign_to_config['name_of_config_item'] = 'value of config item';
 
 
 // --------------------------------------------------------------------
@@ -150,67 +147,63 @@ if (defined('ENVIRONMENT'))
  * ---------------------------------------------------------------
  */
 
-	// Set the current directory correctly for CLI requests
-	if (defined('STDIN'))
-	{
-		chdir(dirname(__FILE__));
-	}
+// Set the current directory correctly for CLI requests
+if (defined('STDIN')) {
+    chdir(dirname(__FILE__));
+}
 
-	if (realpath($system_path) !== FALSE)
-	{
-		$system_path = realpath($system_path).'/';
-	}
+if (realpath($system_path) !== false) {
+    $system_path = realpath($system_path) . '/';
+}
 
-	// ensure there's a trailing slash
-	$system_path = rtrim($system_path, '/').'/';
+// ensure there's a trailing slash
+$system_path = rtrim($system_path, '/') . '/';
 
-	// Is the system path correct?
-	if ( ! is_dir($system_path))
-	{
-		exit("Your system folder path does not appear to be set correctly. Please open the following file and correct this: ".pathinfo(__FILE__, PATHINFO_BASENAME));
-	}
+// Is the system path correct?
+if (! is_dir($system_path)) {
+    exit("Your system folder path does not appear to be set correctly. Please open the following file and correct this: " . pathinfo(
+            __FILE__,
+            PATHINFO_BASENAME
+        ));
+}
 
 /*
  * -------------------------------------------------------------------
  *  Now that we know the path, set the main path constants
  * -------------------------------------------------------------------
  */
-	// The name of THIS file
-	define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
+// The name of THIS file
+define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
 
-	// The PHP file extension
-	// this global constant is deprecated.
-	define('EXT', '.php');
+// The PHP file extension
+// this global constant is deprecated.
+define('EXT', '.php');
 
-	// Path to the system folder
-	define('BASEPATH', str_replace("\\", "/", $system_path));
+// Path to the system folder
+define('BASEPATH', str_replace("\\", "/", $system_path));
 
-	// Path to the front controller (this file)
-	define('FCPATH', str_replace(SELF, '', __FILE__));
+// Path to the front controller (this file)
+define('FCPATH', str_replace(SELF, '', __FILE__));
 
-	// Name of the "system folder"
-	define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
+// Name of the "system folder"
+define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
 
-	// The path to the "application" folder
-	if (is_dir($application_folder))
-	{
-		define('APPPATH', $application_folder.'/');
-	}
-	else
-	{
-		if ( ! is_dir(BASEPATH.$application_folder.'/'))
-		{
-			exit("Your application folder path does not appear to be set correctly. Please open the following file and correct this: ".SELF);
-		}
+// The path to the "application" folder
+if (is_dir($application_folder)) {
+    define('APPPATH', $application_folder . '/');
+} else {
+    if (! is_dir(BASEPATH . $application_folder . '/')) {
+        exit("Your application folder path does not appear to be set correctly. Please open the following file and correct this: " . SELF);
+    }
 
-		define('APPPATH', BASEPATH.$application_folder.'/');
-	}
+    define('APPPATH', BASEPATH . $application_folder . '/');
+}
 
-define('PROJECT_ROOT', realpath(BASEPATH .'/../') .'/');
+define('PROJECT_ROOT', realpath(BASEPATH . '/../') . '/');
 
-define('VENDOR_DIR', realpath('../vendor') .'/');
-include_once VENDOR_DIR .'/autoload.php';
+define('VENDOR_DIR', realpath('../vendor') . '/');
+include_once VENDOR_DIR . '/autoload.php';
 
 $al = new \Composer\Autoload\ClassLoader();
 // $al->set('CustomNamespace', PROJECT_ROOT);
@@ -225,13 +218,14 @@ $al->register();
  *
  */
 register_shutdown_function('shutdown_handler');
-if (!function_exists('my_exception_handler')) {
+if (! function_exists('my_exception_handler')) {
     /**
      * @param Exception $e
      */
-    function my_exception_handler($e) {
-        require_once(BASEPATH .'core/Exceptions.php');
-        require_once(APPPATH .'/core/MY_Exceptions.php');
+    function my_exception_handler($e)
+    {
+        require_once(BASEPATH . 'core/Exceptions.php');
+        require_once(APPPATH . '/core/MY_Exceptions.php');
         if (class_exists('MY_Exceptions')) {
             $_error = new MY_Exceptions();
             $_error->show_exception($e);
@@ -240,23 +234,24 @@ if (!function_exists('my_exception_handler')) {
 
     set_exception_handler('my_exception_handler');
 }
-require_once(VENDOR_DIR .'/ircmaxell/password-compat/lib/password.php');
-require_once(APPPATH .'/third_party/compat.php');
+require_once(VENDOR_DIR . '/ircmaxell/password-compat/lib/password.php');
+require_once(APPPATH . '/third_party/compat.php');
 
-require_once BASEPATH.'core/CodeIgniter.php';
+require_once BASEPATH . 'core/CodeIgniter.php';
 exit();
 
 /**
  * Handler to try and catch errors that would not be caught by normal error handling
  * Note: You MUST NOT assume that anything is available here - (eg. CI_Controller, constants, that get_instance works)
  */
-function shutdown_handler() {
+function shutdown_handler()
+{
     $lastError = error_get_last();
-    if (! (is_array($lastError) && array_key_exists('type', $lastError)) ) {
+    if (! (is_array($lastError) && array_key_exists('type', $lastError))) {
         return;
     }
-    $reportLevels = array (E_PARSE, E_COMPILE_ERROR, E_COMPILE_WARNING, E_CORE_ERROR, E_CORE_WARNING, E_ERROR);
-    if (!in_array($lastError['type'], $reportLevels)) {
+    $reportLevels = array(E_PARSE, E_COMPILE_ERROR, E_COMPILE_WARNING, E_CORE_ERROR, E_CORE_WARNING, E_ERROR);
+    if (! in_array($lastError['type'], $reportLevels)) {
         return;
     }
 
@@ -266,22 +261,23 @@ function shutdown_handler() {
         $emails = DEVELOPER_EMAILS;
     }
 
-    $backtrace = print_r(debug_backtrace(), TRUE);
+    $backtrace = print_r(debug_backtrace(), true);
 
     $msg = "Shutdown Handler Error Report\n"
-        ."Error:\n". print_r($lastError, true) ."\n\n"
-        ."Backtrace:\n". $backtrace ."\n\n"
-        ."_SESSION:\n". (isset($_SESSION) ? print_r($_SESSION, TRUE) : 'unset') ."\n\n"
-        ."_SERVER:\n". print_r($_SERVER, true) ."\n\n"
-        ."--- EOM ---\n";
-    @mail(DEVELOPER_EMAILS, PROJECT_NAME ." Shutdown PHP Error", $msg);
+        . "Error:\n" . print_r($lastError, true) . "\n\n"
+        . "Backtrace:\n" . $backtrace . "\n\n"
+        . "_SESSION:\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'unset') . "\n\n"
+        . "_SERVER:\n" . print_r($_SERVER, true) . "\n\n"
+        . "--- EOM ---\n";
+    @mail(DEVELOPER_EMAILS, PROJECT_NAME . " Shutdown PHP Error", $msg);
 
     if (defined('ERROR_HANDLER_LOG')) {
         file_put_contents(ERROR_HANDLER_LOG, $msg, FILE_APPEND);
     }
 }
 
-function append_include_path($path) {
+function append_include_path($path)
+{
     return set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 }
 

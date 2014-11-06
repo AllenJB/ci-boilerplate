@@ -1,6 +1,9 @@
-<?php if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
+<?php if (! defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
 
-class MY_Exceptions extends CI_Exceptions {
+class MY_Exceptions extends CI_Exceptions
+{
 
     protected $projectName = 'Boilerplate';
 
@@ -8,7 +11,9 @@ class MY_Exceptions extends CI_Exceptions {
 
     static $errors = array();
 
-    function __construct() {
+
+    function __construct()
+    {
         parent::__construct();
         if (defined('PROJECT_NAME')) {
             $this->projectName = PROJECT_NAME;
@@ -18,7 +23,8 @@ class MY_Exceptions extends CI_Exceptions {
     }
 
 
-    protected function setOutputFormat() {
+    protected function setOutputFormat()
+    {
         if ($this->isCliRequest()) {
             $this->outputFormat = 'text';
             return;
@@ -47,7 +53,8 @@ class MY_Exceptions extends CI_Exceptions {
     }
 
 
-    protected function isCliRequest() {
+    protected function isCliRequest()
+    {
         return (php_sapi_name() === 'cli' OR defined('STDIN'));
     }
 
@@ -59,7 +66,8 @@ class MY_Exceptions extends CI_Exceptions {
      * @param bool $log_error log error? yes/no
      * @return void
      */
-    public function show_404($page = '', $log_error = TRUE) {
+    public function show_404($page = '', $log_error = true)
+    {
         if ($this->outputFormat == 'text') {
             print "ERROR: 404: The specified URL does not exist: {$page}\n";
             exit(1);
@@ -70,7 +78,7 @@ class MY_Exceptions extends CI_Exceptions {
         if ($this->outputFormat == 'json') {
             $response = array(
                 'error' => 'not_found',
-                'error_message' => 'The requested end point was not found: '. $page,
+                'error_message' => 'The requested end point was not found: ' . $page,
             );
             print json_encode($response);
             exit();
@@ -78,11 +86,11 @@ class MY_Exceptions extends CI_Exceptions {
 
         // By default we log this, but allow a dev to skip it
         if ($log_error) {
-            log_message('error', '404 Page Not Found --> '.$page);
-            log_message('debug', '_SERVER: '. print_r($_SERVER, TRUE) );
+            log_message('error', '404 Page Not Found --> ' . $page);
+            log_message('debug', '_SERVER: ' . print_r($_SERVER, true));
         }
 
-        include(APPPATH .'errors/error_404.php');
+        include(APPPATH . 'errors/error_404.php');
         exit();
     }
 
@@ -93,20 +101,21 @@ class MY_Exceptions extends CI_Exceptions {
      * This function takes an error message as input (either as a string or an array) and displays
      * it using the specified template.
      *
-     * @param	string $heading the heading
-     * @param	string $message the message
-     * @param	string $template the template name
-     * @param 	int $status_code the status code
-     * @return	string Output to display
+     * @param    string $heading the heading
+     * @param    string $message the message
+     * @param    string $template the template name
+     * @param    int $status_code the status code
+     * @return    string Output to display
      */
-    public function show_error($heading, $message, $template = 'error_general', $status_code = 500) {
+    public function show_error($heading, $message, $template = 'error_general', $status_code = 500)
+    {
         // Prevent recursion
         if (defined('RECURSIVE_SHOW_ERROR')) {
             return '';
         }
         define('RECURSIVE_SHOW_ERROR', 1);
 
-        if (! (($this->outputFormat == 'text') || headers_sent()) ) {
+        if (! (($this->outputFormat == 'text') || headers_sent())) {
             set_status_header($status_code);
         }
 
@@ -126,12 +135,12 @@ class MY_Exceptions extends CI_Exceptions {
                 $subject = 'General Error';
                 $response['error'] = 'general_error';
 
-                if ((stristr($response['error_message'], 'disallowed characters') !== FALSE)) {
+                if ((stristr($response['error_message'], 'disallowed characters') !== false)) {
                     $subject .= ': Disallowed URI Characters';
                     $response['error'] = 'invalid_uri';
 
-                    $config = NULL;
-                    $uri = NULL;
+                    $config = null;
+                    $uri = null;
                     if (is_object($ci)) {
                         $config =& $ci->config;
                         $uri =& $ci->uri;
@@ -145,7 +154,7 @@ class MY_Exceptions extends CI_Exceptions {
                         $qp = str_replace(array('\\-', '\-'), '-', preg_quote($uric, '-'));
                         $matches = array();
                         $str = $uri->uri_string();
-                        $invertedRegex = "|([^". $qp ."]+)|i";
+                        $invertedRegex = "|([^" . $qp . "]+)|i";
                         preg_match_all($invertedRegex, $str, $matches);
                         $response['uri_string'] = $str;
                         $response['disallowed_character_matches'] = $matches;
@@ -162,17 +171,17 @@ class MY_Exceptions extends CI_Exceptions {
         }
 
         $output = '';
-        $first = TRUE;
+        $first = true;
         foreach ($response as $key => $value) {
-            if (!$first) {
+            if (! $first) {
                 $output .= "\n";
             }
-            $first = FALSE;
+            $first = false;
 
-            $output .= $key .': ';
+            $output .= $key . ': ';
 
             if (is_array($value) || is_object($value)) {
-                $output .= "\n". print_r($value) ."\n";
+                $output .= "\n" . print_r($value) . "\n";
             } else if (is_string($value) && (strlen($value) > 80)) {
                 $output .= "\nt$value\n";
             } else {
@@ -181,26 +190,24 @@ class MY_Exceptions extends CI_Exceptions {
         }
 
         $email = $output
-            ."\n\n_SERVER:"
-            ."\n". print_r($_SERVER, TRUE)
-            ."\n\n_SESSION:"
-            ."\n". (isset($_SESSION) ? print_r($_SESSION, TRUE) : 'UNSET')
-        ;
+            . "\n\n_SERVER:"
+            . "\n" . print_r($_SERVER, true)
+            . "\n\n_SESSION:"
+            . "\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'UNSET');
 
-        $requestDump = print_r($_REQUEST, TRUE);
+        $requestDump = print_r($_REQUEST, true);
         if (strlen($requestDump) < 512) {
-            $email .= "\n\n_REQUEST:\n". $requestDump;
+            $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
         }
 
         $email .= ""
-            ."\n\n---EOM---\n"
-        ;
+            . "\n\n---EOM---\n";
 
-        $subject = $this->projectName .' '. $subject;
+        $subject = $this->projectName . ' ' . $subject;
         if (ENVIRONMENT !== 'production') {
-            $subject .= ' - '. ENVIRONMENT;
+            $subject .= ' - ' . ENVIRONMENT;
         }
 
         @mail(DEVELOPER_EMAILS, $subject, $email);
@@ -227,34 +234,34 @@ class MY_Exceptions extends CI_Exceptions {
                     'error_message' => "A technical fault has occurred. The developers have been notified. Please contact support if the issue persists.",
                 );
             }
-            print json_encode($response, TRUE);
+            print json_encode($response, true);
             exit();
         }
 
-        include(APPPATH.'errors/error_general.php');
+        include(APPPATH . 'errors/error_general.php');
         exit(1);
     }
-
 
 
     /**
      * Native PHP error handler
      *
-     * @param	string $severity the error severity
-     * @param	string $message the error string
-     * @param	string $filepath the error filepath
-     * @param	string $line the error line number
-     * @return	string Output to diaplay
+     * @param    string $severity the error severity
+     * @param    string $message the error string
+     * @param    string $filepath the error filepath
+     * @param    string $line the error line number
+     * @return    string Output to diaplay
      */
-    public function show_php_error($severity, $message, $filepath, $line) {
-        $severity = ( ! isset($this->levels[$severity])) ? $severity : $this->levels[$severity];
+    public function show_php_error($severity, $message, $filepath, $line)
+    {
+        $severity = (! isset($this->levels[$severity])) ? $severity : $this->levels[$severity];
 
         $filepath = str_replace("\\", "/", $filepath);
 
         // For safety reasons we do not show the full file path
-        if (FALSE !== strpos($filepath, '/')) {
+        if (false !== strpos($filepath, '/')) {
             $x = explode('/', $filepath);
-            $filepath = $x[count($x)-2].'/'.end($x);
+            $filepath = $x[count($x) - 2] . '/' . end($x);
         }
 
         if (ob_get_level() > $this->ob_level + 1) {
@@ -262,46 +269,43 @@ class MY_Exceptions extends CI_Exceptions {
         }
 
         // Hide some errors from the visitor
-        $hideMessageLevels = array ('runtime notice', 'notice', 'warning', 'user notice', 'user warning');
+        $hideMessageLevels = array('runtime notice', 'notice', 'warning', 'user notice', 'user warning');
         $hideErrors = (in_array(strtolower($severity), $hideMessageLevels));
 
         $stacktrace = $this->get_backtrace_string();
 
         if ((ENVIRONMENT == 'development') && $hideErrors && ($this->outputFormat == 'html')) {
-            include(APPPATH .'errors/error_php_inline.php');
+            include(APPPATH . 'errors/error_php_inline.php');
         }
         if ($this->outputFormat == 'text') {
             $msg = "\n\n{$severity}: {$message}"
-                ."\nLocation: {$filepath} @ line {$line}"
-                ."\n\nSTACK TRACE:\n". $stacktrace
-                ."\n"
-            ;
+                . "\nLocation: {$filepath} @ line {$line}"
+                . "\n\nSTACK TRACE:\n" . $stacktrace
+                . "\n";
             print $msg;
         }
 
-        $email  = "Severity: {$severity}"
-            ."\nMessage: {$message}"
-            ."\nFilename: {$filepath}"
-            ."\nLine: {$line}"
-            ."\n\nSTACK TRACE:\n". $stacktrace
-            ."\n\n_SERVER:\n". print_r($_SERVER, TRUE)
-            ."\n\n_SESSION:\n". (isset($_SESSION) ? print_r($_SESSION, TRUE) : 'UNSET')
-        ;
+        $email = "Severity: {$severity}"
+            . "\nMessage: {$message}"
+            . "\nFilename: {$filepath}"
+            . "\nLine: {$line}"
+            . "\n\nSTACK TRACE:\n" . $stacktrace
+            . "\n\n_SERVER:\n" . print_r($_SERVER, true)
+            . "\n\n_SESSION:\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'UNSET');
 
-        $requestDump = print_r($_REQUEST, TRUE);
+        $requestDump = print_r($_REQUEST, true);
         if (strlen($requestDump) < 512) {
-            $email .= "\n\n_REQUEST:\n". $requestDump;
+            $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
         }
 
         $email .= ""
-            ."\n\n--- EOM ---\n"
-        ;
+            . "\n\n--- EOM ---\n";
 
-        $subject = $this->projectName .' PHP Error';
+        $subject = $this->projectName . ' PHP Error';
         if (ENVIRONMENT != 'production') {
-            $subject.=' - '.ENVIRONMENT;
+            $subject .= ' - ' . ENVIRONMENT;
         }
         $emails = DEVELOPER_EMAILS;
         @mail($emails, $subject, $email);
@@ -312,11 +316,11 @@ class MY_Exceptions extends CI_Exceptions {
 
         // Error has already been displayed inline
         if ($hideErrors) {
-            return FALSE;
+            return false;
         }
 
         if ($this->outputFormat == 'html') {
-            include(APPPATH.'errors/error_php.php');
+            include(APPPATH . 'errors/error_php.php');
         }
 
         if ($this->outputFormat == 'json') {
@@ -347,7 +351,8 @@ class MY_Exceptions extends CI_Exceptions {
     /**
      * @param Exception $e
      */
-    public function show_exception($e) {
+    public function show_exception($e)
+    {
         if (ob_get_level() > $this->ob_level + 1) {
             ob_end_flush();
         }
@@ -359,7 +364,7 @@ class MY_Exceptions extends CI_Exceptions {
         $message = $e->getMessage();
         $filepath = $e->getFile();
 
-        $ci = NULL;
+        $ci = null;
         if (class_exists('CI_Controller')) {
             $ci =& get_instance();
         }
@@ -367,26 +372,25 @@ class MY_Exceptions extends CI_Exceptions {
         $email = $this->get_exception_stack_string($e);
 
         if (is_object($ci) && isset($ci->session) && is_object($ci->session)) {
-            $email .= "\n\nSession:\n". print_r($ci->session->all_userdata(), TRUE);
+            $email .= "\n\nSession:\n" . print_r($ci->session->all_userdata(), true);
         } else {
-            $email .= "\n\nSession:\n". (isset($_SESSION) ? print_r($_SESSION, TRUE) : 'UNSET');
+            $email .= "\n\nSession:\n" . (isset($_SESSION) ? print_r($_SESSION, true) : 'UNSET');
         }
 
-        $requestDump = print_r($_REQUEST, TRUE);
+        $requestDump = print_r($_REQUEST, true);
         if (strlen($requestDump) < 512) {
-            $email .= "\n\n_REQUEST:\n". $requestDump;
+            $email .= "\n\n_REQUEST:\n" . $requestDump;
         } else {
             $email .= "\n\n_REQUEST: (excluded due to size)";
         }
 
         $email .= ""
-            ."\n\n_SERVER:\n". print_r($_SERVER, TRUE)
-            ."\n\n--- EOM ---\n"
-        ;
+            . "\n\n_SERVER:\n" . print_r($_SERVER, true)
+            . "\n\n--- EOM ---\n";
 
-        $subject = PROJECT_NAME .' Uncaught Exception';
+        $subject = PROJECT_NAME . ' Uncaught Exception';
         if (ENVIRONMENT !== 'production') {
-            $subject.=' - '.ENVIRONMENT;
+            $subject .= ' - ' . ENVIRONMENT;
         }
         mail(DEVELOPER_EMAILS, $subject, $email);
 
@@ -396,14 +400,14 @@ class MY_Exceptions extends CI_Exceptions {
 
         if ($this->outputFormat == 'html') {
             ob_start();
-            include(APPPATH .'errors/error_php.php');
+            include(APPPATH . 'errors/error_php.php');
             $buffer = ob_get_contents();
             ob_end_clean();
             echo $buffer;
         } else if ($this->outputFormat == 'text') {
             print "\nUncaught Exception: {$message}"
-                ."\nLocation: {$filepath} @ line {$line}"
-                ."\n\n{$stacktrace}\n";
+                . "\nLocation: {$filepath} @ line {$line}"
+                . "\n\n{$stacktrace}\n";
         } else if ($this->outputFormat == 'json') {
             if (ENVIRONMENT == 'production') {
                 $response = array(
@@ -426,14 +430,15 @@ class MY_Exceptions extends CI_Exceptions {
     }
 
 
-    protected function get_exception_as_array(Exception $e) {
-        $retval = array (
+    protected function get_exception_as_array(Exception $e)
+    {
+        $retval = array(
             'class' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
-            'previous' => (is_object($e->getPrevious()) ? $this->get_exception_as_array($e->getPrevious()) : NULL),
+            'previous' => (is_object($e->getPrevious()) ? $this->get_exception_as_array($e->getPrevious()) : null),
             'trace' => $e->getTrace(),
         );
         return $retval;
@@ -441,15 +446,16 @@ class MY_Exceptions extends CI_Exceptions {
 
 
     //generate stack trace ignoreing most of CI's crap
-    protected function get_backtrace_string() {
+    protected function get_backtrace_string()
+    {
         $stacktrace = "";
         $backtrace = debug_backtrace();
-        $skipClassList = array ('CI_Exceptions', 'MY_Exceptions');
+        $skipClassList = array('CI_Exceptions', 'MY_Exceptions');
         foreach ($backtrace as $index => $call) {
             $index++;
 
             if (array_key_exists('class', $call) && in_array($call['class'], $skipClassList)) {
-                $stacktrace = $index .": {$call['class']} - Skipped\n";
+                $stacktrace = $index . ": {$call['class']} - Skipped\n";
                 continue;
             }
 
@@ -469,15 +475,15 @@ class MY_Exceptions extends CI_Exceptions {
                     } else if (is_array($arg)) {
                         $args .= 'Array[]';
                     } else if (is_string($arg)) {
-                        $args .= '"'. $arg .'"';
+                        $args .= '"' . $arg . '"';
                     } else {
                         $args .= $arg;
                     }
                 }
             }
-            $stacktrace .= $index .': '. @$call['class'] .'::'. @$call['function'] ."($args)"
-                ."\n\t". @$call['file'] .'('. @$call['line'] .')'
-                ."\n";
+            $stacktrace .= $index . ': ' . @$call['class'] . '::' . @$call['function'] . "($args)"
+                . "\n\t" . @$call['file'] . '(' . @$call['line'] . ')'
+                . "\n";
         }
 
         return $stacktrace;
@@ -488,23 +494,21 @@ class MY_Exceptions extends CI_Exceptions {
      * @param Exception $e
      * @return string
      */
-    protected function get_exception_stack_string($e) {
+    protected function get_exception_stack_string($e)
+    {
         $email = "Message: {$e->getMessage()}"
-            ."\nCode: ". $e->getCode()
-            ."\nLine: ". $e->getLine()
-            ."\nFile: ". $e->getFile()
-            ."\nStack Trace:\n". $e->getTraceAsString()
+            . "\nCode: " . $e->getCode()
+            . "\nLine: " . $e->getLine()
+            . "\nFile: " . $e->getFile()
+            . "\nStack Trace:\n" . $e->getTraceAsString()
 //            ."\n\nRaw trace:\n". print_r($e->getTrace(), TRUE)
-            ."\n\n";
-        ;
+            . "\n\n";;
 
         if (is_object($e->getPrevious())) {
             $email .= "--- Previous Exception ---\n"
-                . $this->get_exception_stack_string($e->getPrevious())
-            ;
+                . $this->get_exception_stack_string($e->getPrevious());
         }
 
         return $email;
     }
-
 }
