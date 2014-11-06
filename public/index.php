@@ -1,6 +1,9 @@
 <?php
+define('SCRIPT_START', microtime(true));
 define('PROJECT_NAME', 'Boilerplate');
 date_default_timezone_set("Europe/London");
+ini_set('default_charset', 'UTF-8');
+mb_internal_encoding("UTF-8");
 
 /*
  *---------------------------------------------------------------
