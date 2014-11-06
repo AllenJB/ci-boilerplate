@@ -2,7 +2,7 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 4.3.2 or newer
+ * An open source application development framework for PHP 5.1.6 or newer
  *
  * @package		CodeIgniter
  * @author		ExpressionEngine Dev Team
@@ -201,7 +201,6 @@ class CI_Cache_memcached extends CI_Driver {
 		if ( ! extension_loaded('memcached'))
 		{
 			log_message('error', 'The Memcached Extension must be loaded to use Memcached Cache.');
-			
 			return FALSE;
 		}
 		
@@ -209,10 +208,7 @@ class CI_Cache_memcached extends CI_Driver {
 		return TRUE;
 	}
 
-	// ------------------------------------------------------------------------
-
 }
-// End Class
 
 /* End of file Cache_memcached.php */
 /* Location: ./system/libraries/Cache/drivers/Cache_memcached.php */

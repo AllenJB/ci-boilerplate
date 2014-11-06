@@ -546,7 +546,6 @@ class CI_Cart {
 
 
 }
-// END Cart Class
 
 /* End of file Cart.php */
 /* Location: ./system/libraries/Cart.php */

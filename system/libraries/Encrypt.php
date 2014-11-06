@@ -18,7 +18,7 @@
 /**
  * CodeIgniter Encryption Class
  *
- * Provides two-way keyed encoding using XOR Hashing and Mcrypt
+ * Provides two-way keyed encoding using Mcrypt
  *
  * @package		CodeIgniter
  * @subpackage	Libraries
