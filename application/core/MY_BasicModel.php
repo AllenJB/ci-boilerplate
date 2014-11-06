@@ -91,6 +91,11 @@ class MY_BasicModel extends CI_Model
      */
     protected function escapeArray(array $array)
     {
+        if (! is_array($array)) {
+            trigger_error('Parameter 0 ($array) is not an array');
+            return $array;
+        }
+
         foreach ($array as $key => $value) {
             if (! (is_array($value) || is_object($value))) {
                 $array[$key] = $this->db->escape($value);

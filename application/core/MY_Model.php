@@ -33,6 +33,16 @@ class MY_Model extends MY_BasicModel
      */
     protected $hasDtModified = false;
 
+    /**
+     * @var null Default order for results from fetchBySearch. This should be an SQL string.
+     */
+    protected $defaultSearchResultsOrder = null;
+
+    /**
+     * @var null|array Fields to select for fetchBySearch method
+     */
+    protected $fetchBySearchFields = null;
+
 
     public function __construct()
     {
@@ -116,6 +126,7 @@ class MY_Model extends MY_BasicModel
 
     /**
      * @param array $searchParams Search Parameters
+     *
      * @return CI_DB_Result|null|bool
      */
     public function fetchBySearch(array $searchParams)
@@ -124,61 +135,47 @@ class MY_Model extends MY_BasicModel
         $this->db->from($table);
         $limit = null;
         $offset = '';
-        $orderBy = null;
+        $orderBy = $this->defaultSearchResultsOrder;
         $deleted = false;
-        $fields = array("`{$table}`.*");
+        $this->fetchBySearchFields = array("`{$table}`.*");
         $action = 'select';
 
         foreach ($searchParams as $key => $value) {
+            if (is_array($value) && count($value) < 1) {
+                return $this->returnError("Value for parameter '{$key}' cannot be an empty array");
+            }
+
             switch ($key) {
-                case $this->keyField:
-                    $this->db->where_in($key, $value);
-                    break;
-
-                case 'created_after':
-                    if (is_object($value) && ($value instanceof DateTime)) {
-                        $value = $value->format('Y-m-d H:i:s');
-                    }
-                    $this->db->where('dt_created >=', $value);
-                    break;
-
-                case 'created_before':
-                    if (is_object($value) && ($value instanceof DateTime)) {
-                        $value = $value->format('Y-m-d H:i:s');
-                    }
-                    $this->db->where('dt_created <=', $value);
-                    break;
-
                 case 'deleted':
                     $deleted = $value;
                     break;
 
-                case 'limit':
+                case '_limit':
                     $limit = $value;
                     break;
 
-                case 'offset':
+                case '_offset':
                     $offset = $value;
                     break;
 
-                case 'order_by':
+                case '_order_by':
                     $orderBy = $value;
                     break;
 
-                case 'fields':
+                case '_fields':
                     if (! is_array($value)) {
                         return $this->returnError("Value for parameter 'fields' must be an array");
                     }
-                    $fields = $value;
+                    $this->fetchBySearchFields = $value;
                     break;
 
-                case 'additional_fields':
+                case '_additional_fields':
                     if (is_array($value)) {
                         foreach ($value as $entry) {
-                            $fields[] = $entry;
+                            $this->fetchBySearchFields[] = $entry;
                         }
                     } else {
-                        $fields[] = $value;
+                        $this->fetchBySearchFields[] = $value;
                     }
                     break;
 
@@ -187,15 +184,21 @@ class MY_Model extends MY_BasicModel
                     break;
 
                 default:
-                    return $this->returnError("Invalid search parameter specified: {$key}");
+                    $handled = $this->fetchBySearchCoreParam($key, $value);
+                    if (! $handled) {
+                        $handled = $this->fetchBySearchParam($key, $value);
+                        if (! $handled) {
+                            return $this->returnError("Invalid search parameter specified: {$key}");
+                        }
+                    }
             }
         }
 
         if (($this->softDelete) && ($deleted !== null)) {
-            $this->db->where('deleted', ($deleted ? 1 : 0));
+            $this->db->where("{$table}.deleted", ($deleted ? 1 : 0));
         }
 
-        $this->db->select(array_reverse($fields));
+        $this->db->select(array_reverse($this->fetchBySearchFields));
         if ($limit !== null) {
             $this->db->limit($limit, $offset);
         }
@@ -220,6 +223,47 @@ class MY_Model extends MY_BasicModel
             default:
                 return $this->returnError("Invalid action specified: {$action}");
         }
+    }
+
+
+    protected function fetchBySearchCoreParam($key, $value)
+    {
+
+        switch ($key) {
+            case $this->keyField:
+                $this->db->where_in($this->table . '.' . $key, $value);
+                return true;
+
+            case 'created_after':
+                if (is_object($value) && ($value instanceof DateTime)) {
+                    $value = $value->format('Y-m-d H:i:s');
+                }
+                $this->db->where('dt_created >=', $value);
+                return true;
+
+            case 'created_before':
+                if (is_object($value) && ($value instanceof DateTime)) {
+                    $value = $value->format('Y-m-d H:i:s');
+                }
+                $this->db->where('dt_created <=', $value);
+                return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Hook to handle extra search parameters for fetchBySearch without redefining the entire method.
+     *
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return bool Parameter was handled?
+     */
+    protected function fetchBySearchParam($key, $value)
+    {
+        return false;
     }
 
 
