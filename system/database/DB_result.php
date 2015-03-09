@@ -408,6 +408,25 @@ class CI_DB_result {
      */
     public function _fetch_object() { return NULL; }
 
+    /**
+     * Returns an unbuffered row and move pointer to next row
+     *
+     * @param	string	$type	'array', 'object' or a custom class name
+     * @return	mixed
+     */
+    public function unbuffered_row($type = 'object')
+    {
+        if ($type === 'array')
+        {
+            return $this->_fetch_assoc();
+        }
+        elseif ($type === 'object')
+        {
+            return $this->_fetch_object();
+        }
+        return $this->_fetch_object($type);
+    }
+
 }
 // END DB_result class
 
